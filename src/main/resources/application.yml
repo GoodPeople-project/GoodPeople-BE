@@ -1,0 +1,15 @@
+spring:
+  application:
+    name: goodpeople
+  ### DB ###
+  # MySQL
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: ${DATABASE_URL}
+    username: ${DATABASE_USERNAME}
+    password: ${DATABASE_PASSWORD}
+  # JPA
+  jpa:
+    Hibernate:
+      ddl-auto: update
+    show-sql: true
