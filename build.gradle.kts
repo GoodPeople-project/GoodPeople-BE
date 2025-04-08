@@ -34,6 +34,9 @@ dependencies {
 
     // MySQL
     runtimeOnly("com.mysql:mysql-connector-j")
+
+    // AOP
+    implementation("org.springframework.boot:spring-boot-starter-aop")
 }
 
 kotlin {
