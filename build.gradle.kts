@@ -37,6 +37,9 @@ dependencies {
 
     // AOP
     implementation("org.springframework.boot:spring-boot-starter-aop")
+
+    // Validation
+    implementation("org.springframework.boot:spring-boot-starter-validation")
 }
 
 kotlin {
