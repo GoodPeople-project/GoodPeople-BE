@@ -43,6 +43,9 @@ dependencies {
 
     // DevTools
     compileOnly("org.springframework.boot:spring-boot-devtools")
+
+    // Security
+    implementation("org.springframework.boot:spring-boot-starter-security")
 }
 
 kotlin {
