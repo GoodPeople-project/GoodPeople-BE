@@ -40,6 +40,9 @@ dependencies {
 
     // Validation
     implementation("org.springframework.boot:spring-boot-starter-validation")
+
+    // DevTools
+    compileOnly("org.springframework.boot:spring-boot-devtools")
 }
 
 kotlin {
