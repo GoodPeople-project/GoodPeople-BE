@@ -12,7 +12,9 @@ import team.goodpeople.user.repository.UserRepository
 @Service
 class UserService(private val userRepository: UserRepository) {
 
-    fun signUp(dto: SignUpRequest): Boolean {
+    fun signUp(
+        dto: SignUpRequest
+    ): Boolean {
 
         if (userRepository.existsByUsername(dto.username)) {
             throw GlobalException(CustomErrorCode.USERNAME_DUPLICATED)
@@ -30,7 +32,10 @@ class UserService(private val userRepository: UserRepository) {
         return true
     }
 
-    fun updateNickname(userId: Long, dto: UpdateNicknameRequest): Boolean {
+    fun updateNickname(
+        userId: Long,
+        dto: UpdateNicknameRequest
+    ): Boolean {
 
         /** nickname 필드의 null 여부는 프론트에서 1차 검증 */
 
@@ -58,11 +63,17 @@ class UserService(private val userRepository: UserRepository) {
         return true
     }
 
-    fun checkNicknameDuplication(dto: UpdateNicknameRequest): Boolean {
+    fun checkNicknameDuplication(
+        dto: UpdateNicknameRequest
+    ): Boolean {
+
         return userRepository.existsByNickname(dto.nickname)
     }
 
-    fun updatePassword(userId: Long, dto: UpdatePasswordRequest): Boolean {
+    fun updatePassword(
+        userId: Long,
+        dto: UpdatePasswordRequest
+    ): Boolean {
 
         /** 요청자 ID 유효성 검사 */
         val user = userRepository.findById(userId)
@@ -76,6 +87,45 @@ class UserService(private val userRepository: UserRepository) {
 
         user.updatePassword(newPassword)
         userRepository.save(user)
+
+        return true
+    }
+
+    fun softDeleteUser(
+        userId: Long
+    ): Boolean {
+
+        val user = userRepository.findUserById(userId) ?: throw GlobalException(CustomErrorCode.USER_NOT_EXISTS)
+
+        if (user.isDeleted()) throw GlobalException(CustomErrorCode.USER_ALREADY_DELETED)
+
+        user.softDelete()
+        userRepository.save(user)
+
+        return true
+    }
+
+    fun recoverUser(
+        userId: Long
+    ): Boolean {
+
+        val user = userRepository.findUserById(userId) ?: throw GlobalException(CustomErrorCode.USER_NOT_EXISTS)
+
+        if (!user.isDeleted()) throw GlobalException(CustomErrorCode.USER_NOT_DELETED)
+
+        user.recoveryDelete()
+        userRepository.save(user)
+
+        return true
+    }
+
+    fun hardDeleteUser(
+        userId: Long
+    ): Boolean {
+
+        userRepository.findUserById(userId) ?: throw GlobalException(CustomErrorCode.USER_NOT_EXISTS)
+
+        userRepository.deleteUser(userId)
 
         return true
     }

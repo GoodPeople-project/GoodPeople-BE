@@ -56,7 +56,8 @@ class UserController(private val userService: UserService) {
     @PatchMapping(("/password/{userId}"))
     fun updatePassword(
             @PathVariable userId: Long,
-            @RequestBody @Valid dto: UpdatePasswordRequest): ApiResponse<Boolean> {
+            @RequestBody @Valid dto: UpdatePasswordRequest
+    ): ApiResponse<Boolean> {
 
         return if (userService.updatePassword(userId, dto)) {
             ApiResponse.success(
@@ -70,5 +71,38 @@ class UserController(private val userService: UserService) {
                 "변경 사항이 없습니다."
             )
         }
+    }
+
+    @PatchMapping("/{userId}/delete")
+    fun deleteUser(
+        @PathVariable userId: Long
+    ): ApiResponse<Boolean> {
+
+        return ApiResponse.success(
+            userService.softDeleteUser(userId),
+            HttpStatus.OK.value()
+        )
+    }
+
+    @PatchMapping("/{userId}/recovery")
+    fun recoverUser(
+        @PathVariable userId: Long
+    ): ApiResponse<Boolean> {
+
+        return ApiResponse.success(
+            userService.recoverUser(userId),
+            HttpStatus.OK.value()
+        )
+    }
+
+    @DeleteMapping("/{userId}/deletion")
+    fun hardDeleteUser(
+        @PathVariable userId: Long
+    ): ApiResponse<Boolean> {
+
+        return ApiResponse.success(
+            userService.hardDeleteUser(userId),
+            HttpStatus.NO_CONTENT.value()
+        )
     }
 }

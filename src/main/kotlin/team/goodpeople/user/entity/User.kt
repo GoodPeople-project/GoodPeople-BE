@@ -4,6 +4,7 @@ import jakarta.persistence.*
 import jakarta.validation.constraints.NotNull
 import jakarta.validation.constraints.Pattern
 import jakarta.validation.constraints.Size
+import team.goodpeople.common.BaseEntity
 
 /**
  * User Entity
@@ -79,7 +80,7 @@ class User private constructor (
     @field:Enumerated(EnumType.STRING)
     @field:Column(name = "role")
     var role: Role = Role.ROLE_USER
-) {
+) : BaseEntity() {
     @field:NotNull
     @field:Size(min = 8, max = 30)
     @field:Column(name = "password")

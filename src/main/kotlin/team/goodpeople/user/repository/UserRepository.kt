@@ -9,4 +9,7 @@ interface UserRepository : CrudRepository<User, Long> {
 
     fun existsByNickname(nickname: String): Boolean
 
+    fun findUserById(userId: Long): User?
+
+    fun deleteUser(userId: Long)
 }
