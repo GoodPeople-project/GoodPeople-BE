@@ -125,7 +125,7 @@ class UserService(private val userRepository: UserRepository) {
 
         userRepository.findUserById(userId) ?: throw GlobalException(CustomErrorCode.USER_NOT_EXISTS)
 
-        userRepository.deleteUser(userId)
+        userRepository.deleteUserById(userId)
 
         return true
     }

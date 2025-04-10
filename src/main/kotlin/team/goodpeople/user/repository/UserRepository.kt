@@ -11,5 +11,5 @@ interface UserRepository : CrudRepository<User, Long> {
 
     fun findUserById(userId: Long): User?
 
-    fun deleteUser(userId: Long)
+    fun deleteUserById(userId: Long)
 }
