@@ -1,6 +1,7 @@
 package team.goodpeople.user.entity
 
 import jakarta.persistence.*
+import jakarta.validation.constraints.NotNull
 import jakarta.validation.constraints.Pattern
 import jakarta.validation.constraints.Size
 
@@ -33,6 +34,7 @@ class User private constructor (
      * - OAuth2 로그인 시, username을 받아온다.
      * - 조회 가능 / 수정 불가능
      */
+    @field:NotNull
     @field:Size(min = 5, max = 50)
     @field:Column(name = "username", unique = true)
     val username: String,
@@ -51,6 +53,7 @@ class User private constructor (
      * - 커뮤니티에서 사용할 닉네임이다.
      * - 조회 가능 / 수정 가능
      */
+    @field:NotNull
     @field:Size(min = 2, max = 10)
     @field:Column(name = "nickname", unique = true)
     var nickname: String,
@@ -60,6 +63,7 @@ class User private constructor (
      * - 정보성 메일 수신 등, 서비스 이용을 위해 사용한다.
      * - 조회 가능 / 수정 가능
      */
+    @field:NotNull
     @field:Size(max = 100)
     @field:Pattern(regexp = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$")
     @field:Column(name = "email", unique = true)
@@ -71,10 +75,12 @@ class User private constructor (
      * - 크게는 관리자/일반 사용자, 추후 기능 확장으로 권한 추가
      * - 조회 가능 / 수정 가능
      */
+    @field:NotNull
     @field:Enumerated(EnumType.STRING)
     @field:Column(name = "role")
     var role: Role = Role.ROLE_USER
 ) {
+    @field:NotNull
     @field:Size(min = 8, max = 30)
     @field:Column(name = "password")
     var password = password
