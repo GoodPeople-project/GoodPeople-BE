@@ -1,0 +1,83 @@
+package team.goodpeople.user.service
+
+import org.springframework.stereotype.Service
+import team.goodpeople.global.exception.CustomErrorCode
+import team.goodpeople.global.exception.GlobalException
+import team.goodpeople.user.dto.SignUpRequest
+import team.goodpeople.user.dto.UpdateNicknameRequest
+import team.goodpeople.user.dto.UpdatePasswordRequest
+import team.goodpeople.user.entity.User.Companion.signUpWithForm
+import team.goodpeople.user.repository.UserRepository
+
+@Service
+class UserService(private val userRepository: UserRepository) {
+
+    fun signUp(dto: SignUpRequest): Boolean {
+
+        if (userRepository.existsByUsername(dto.username)) {
+            throw GlobalException(CustomErrorCode.USERNAME_DUPLICATED)
+        }
+
+        val newUser = signUpWithForm(
+            dto.username,
+            dto.password,
+            dto.nickname,
+            dto.email
+        )
+
+        userRepository.save(newUser)
+
+        return true
+    }
+
+    fun updateNickname(userId: Long, dto: UpdateNicknameRequest): Boolean {
+
+        /** nickname 필드의 null 여부는 프론트에서 1차 검증 */
+
+        /** 요청자 ID 유효성 검사 */
+        val user = userRepository.findById(userId)
+            .orElseThrow { throw GlobalException(CustomErrorCode.USER_NOT_EXISTS) }
+
+        /** 중복 재검사 */
+        if (checkNicknameDuplication(dto)) {
+            throw GlobalException(CustomErrorCode.NICKNAME_DUPLICATED)
+        }
+
+        /** nickname 필드가 null로 들어왔다면 Valid 검증에 걸렸을 것이다. */
+        val newNickname = dto.nickname
+
+        /** 새로운 닉네임이 이전 닉네임과 동일한 경우, 컨트롤러에서 '변경 없음' 응답 */
+        if (newNickname == user.nickname) {
+            return false
+        }
+
+        /** 저장 */
+        user.updateNickname(newNickname)
+        userRepository.save(user)
+
+        return true
+    }
+
+    fun checkNicknameDuplication(dto: UpdateNicknameRequest): Boolean {
+        return userRepository.existsByNickname(dto.nickname)
+    }
+
+    fun updatePassword(userId: Long, dto: UpdatePasswordRequest): Boolean {
+
+        /** 요청자 ID 유효성 검사 */
+        val user = userRepository.findById(userId)
+            .orElseThrow { throw GlobalException(CustomErrorCode.USER_NOT_EXISTS) }
+        val newPassword = dto.password
+
+        /** 새로운 비밀번호가 이전 비밀번호와 동일한 경우, 컨트롤러에서 '변경 없음' 응답 */
+        if (newPassword == user.password) {
+            return false
+        }
+
+        user.updatePassword(newPassword)
+        userRepository.save(user)
+
+        return true
+    }
+
+}
