@@ -1,4 +1,4 @@
-package team.goodpeople.global.config
+package team.goodpeople.security.config
 
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
