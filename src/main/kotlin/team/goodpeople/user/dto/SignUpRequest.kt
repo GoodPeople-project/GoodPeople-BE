@@ -9,7 +9,7 @@ data class SignUpRequest(
     @field:NotNull(message = "username cannot be blank")
     val username: String,
 
-    @field:Size(min = 8, max = 30)
+    @field:Size(min = 8)
     @field:NotNull(message = "password cannot be blank")
     val password: String,
 

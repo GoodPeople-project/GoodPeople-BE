@@ -82,7 +82,7 @@ class User private constructor (
     var role: Role = Role.ROLE_USER
 ) : BaseEntity() {
     @field:NotNull
-    @field:Size(min = 8, max = 30)
+    @field:Size(min = 8)
     @field:Column(name = "password")
     var password = password
         private set

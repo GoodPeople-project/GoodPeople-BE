@@ -1,5 +1,6 @@
 package team.goodpeople.user.service
 
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.stereotype.Service
 import team.goodpeople.global.exception.CustomErrorCode
 import team.goodpeople.global.exception.GlobalException
@@ -10,7 +11,10 @@ import team.goodpeople.user.entity.User.Companion.signUpWithForm
 import team.goodpeople.user.repository.UserRepository
 
 @Service
-class UserService(private val userRepository: UserRepository) {
+class UserService(
+    private val userRepository: UserRepository,
+    private val bCryptPasswordEncoder: BCryptPasswordEncoder
+) {
 
     fun signUp(
         dto: SignUpRequest
@@ -21,10 +25,10 @@ class UserService(private val userRepository: UserRepository) {
         }
 
         val newUser = signUpWithForm(
-            dto.username,
-            dto.password,
-            dto.nickname,
-            dto.email
+            username = dto.username,
+            password = bCryptPasswordEncoder.encode(dto.password),
+            nickname = dto.nickname,
+            email = dto.email
         )
 
         userRepository.save(newUser)
@@ -78,12 +82,13 @@ class UserService(private val userRepository: UserRepository) {
         /** 요청자 ID 유효성 검사 */
         val user = userRepository.findById(userId)
             .orElseThrow { throw GlobalException(CustomErrorCode.USER_NOT_EXISTS) }
-        val newPassword = dto.password
 
         /** 새로운 비밀번호가 이전 비밀번호와 동일한 경우, 컨트롤러에서 '변경 없음' 응답 */
-        if (newPassword == user.password) {
+        if (bCryptPasswordEncoder.matches(dto.password, user.password)) {
             return false
         }
+
+        val newPassword = bCryptPasswordEncoder.encode(dto.password)
 
         user.updatePassword(newPassword)
         userRepository.save(user)
