@@ -9,12 +9,14 @@ import org.springframework.security.config.http.SessionCreationPolicy
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
+import team.goodpeople.security.jwt.JWTUtil
 import team.goodpeople.security.jwt.LoginFilter
 
 @EnableWebSecurity
 @Configuration
 class SecurityConfig(
-    private val authenticationConfiguration: AuthenticationConfiguration
+    private val authenticationConfiguration: AuthenticationConfiguration,
+    private val jwtUtil: JWTUtil
 ) {
 
     @Bean
@@ -34,14 +36,13 @@ class SecurityConfig(
             .authorizeHttpRequests {
                 it
                     .requestMatchers("/", "/api/login").permitAll()
-                    .requestMatchers(("/api/**")).permitAll()
+                    .requestMatchers("/api/admin", "/api/admin/**").hasRole("ADMIN")
                     .requestMatchers(("/api/user/**")).permitAll()
-                    .requestMatchers("/api/admin/**").hasRole("ADMIN")
                     .anyRequest().permitAll()
             }
 
         http
-            .addFilterAt(LoginFilter(authenticationManager), UsernamePasswordAuthenticationFilter::class.java)
+            .addFilterAt(LoginFilter(authenticationManager, jwtUtil), UsernamePasswordAuthenticationFilter::class.java)
 
         return http.build()
     }

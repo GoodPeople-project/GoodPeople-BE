@@ -17,6 +17,7 @@ import team.goodpeople.security.dto.LoginRequest
 
 class LoginFilter(
     private val authenticationManager: AuthenticationManager,
+    private val jwtUtil: JWTUtil
 ) : UsernamePasswordAuthenticationFilter() {
 
     init {
@@ -48,15 +49,31 @@ class LoginFilter(
         chain: FilterChain,
         authResult: Authentication
     ) {
-        // TODO: 성공 로직. UserDetails 구성 고민 및 JWT 추가 후 작성
+        // TODO: 성공 로직. UserDetails 구성 고민 및 리프레시 토큰 저장 로직 추가
         val authenticatedUser = authResult.principal as CustomUserDetails
-        val result = mapOf("access token" to "PLEASE ADD ACCESS TOKEN")
 
+        val accessToken = jwtUtil.createAccessToken(
+            userId = authenticatedUser.getUserID(),
+            username = authenticatedUser.username,
+            role = authenticatedUser.authorities.toString()
+        )
+
+        val refreshToken = jwtUtil.createRefreshToken(
+            userId = authenticatedUser.getUserID(),
+            username = authenticatedUser.username,
+            role = authenticatedUser.authorities.toString()
+        )
+
+        val result = jwtUtil.convertTokenToResponse(accessToken, refreshToken)
+
+        // TODO: Response 작성 메서드 구현 고려
         response.status = HttpServletResponse.SC_OK
         response.contentType = "application/json"
         response.characterEncoding = "UTF-8"
 
-        val apiResponse = ApiResponse.success(result)
+        val apiResponse = ApiResponse.success(
+            result = result,
+            message = "login successful",)
 
         val objectMapper = ObjectMapper()
         response.writer.write(objectMapper.writeValueAsString(apiResponse))

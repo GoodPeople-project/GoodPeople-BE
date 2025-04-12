@@ -21,6 +21,7 @@ class JWTUtil(
         SecretKeySpec(Base64.getDecoder().decode(secret), "HmacSHA256")
 
     fun createAccessToken(
+        userId: Long,
         username: String,
         role: String
     ): String {
@@ -28,6 +29,7 @@ class JWTUtil(
         return Jwts.builder()
             .claim("type", TOKEN_TYPE)
             .claim("cat", ACCESS_CATEGORY)
+            .claim("id", userId)
             .claim("username", username)
             .claim("role", role)
             .issuedAt(Date(System.currentTimeMillis()))
@@ -37,6 +39,7 @@ class JWTUtil(
     }
 
     fun createRefreshToken(
+        userId: Long,
         username: String,
         role: String
     ): String {
@@ -44,6 +47,7 @@ class JWTUtil(
         return Jwts.builder()
             .claim("type", TOKEN_TYPE)
             .claim("cat", ACCESS_CATEGORY)
+            .claim("id", userId)
             .claim("username", username)
             .claim("role", role)
             .issuedAt(Date(System.currentTimeMillis()))
