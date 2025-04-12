@@ -1,6 +1,9 @@
 package team.goodpeople.global.response
 
+import java.time.LocalDateTime
+
 data class ApiResponse<T>(
+    val timestamp: LocalDateTime = LocalDateTime.now(),
     val status: Int,
     val message: String,
     val result: T? = null
