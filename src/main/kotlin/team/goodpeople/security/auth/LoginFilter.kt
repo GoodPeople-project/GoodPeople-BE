@@ -1,4 +1,4 @@
-package team.goodpeople.security.jwt
+package team.goodpeople.security.auth
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import jakarta.servlet.FilterChain
@@ -12,8 +12,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import team.goodpeople.global.exception.CustomErrorCode
 import team.goodpeople.global.exception.GlobalException
 import team.goodpeople.global.response.ApiResponse
-import team.goodpeople.security.dto.CustomUserDetails
-import team.goodpeople.security.dto.LoginRequest
+import team.goodpeople.security.jwt.JWTUtil
 
 class LoginFilter(
     private val authenticationManager: AuthenticationManager,

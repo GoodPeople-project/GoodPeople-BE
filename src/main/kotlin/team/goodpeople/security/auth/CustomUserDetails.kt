@@ -1,4 +1,4 @@
-package team.goodpeople.security.dto
+package team.goodpeople.security.auth
 
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.authority.SimpleGrantedAuthority

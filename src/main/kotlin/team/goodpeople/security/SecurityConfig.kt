@@ -1,4 +1,4 @@
-package team.goodpeople.security.config
+package team.goodpeople.security
 
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -10,7 +10,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
 import team.goodpeople.security.jwt.JWTUtil
-import team.goodpeople.security.jwt.LoginFilter
+import team.goodpeople.security.auth.LoginFilter
 
 @EnableWebSecurity
 @Configuration

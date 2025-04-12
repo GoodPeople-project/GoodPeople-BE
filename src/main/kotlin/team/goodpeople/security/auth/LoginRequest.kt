@@ -1,4 +1,4 @@
-package team.goodpeople.security.dto
+package team.goodpeople.security.auth
 
 data class LoginRequest(
     val username: String? = null,

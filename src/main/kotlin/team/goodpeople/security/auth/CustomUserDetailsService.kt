@@ -1,9 +1,8 @@
-package team.goodpeople.security.service
+package team.goodpeople.security.auth
 
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.stereotype.Service
-import team.goodpeople.security.dto.CustomUserDetails
 import team.goodpeople.user.repository.UserRepository
 
 @Service
