@@ -1,5 +1,6 @@
 package team.goodpeople.security
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration
@@ -9,6 +10,7 @@ import org.springframework.security.config.http.SessionCreationPolicy
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
+import team.goodpeople.global.response.ResponseWriter
 import team.goodpeople.security.jwt.JWTUtil
 import team.goodpeople.security.auth.LoginFilter
 
@@ -16,7 +18,8 @@ import team.goodpeople.security.auth.LoginFilter
 @Configuration
 class SecurityConfig(
     private val authenticationConfiguration: AuthenticationConfiguration,
-    private val jwtUtil: JWTUtil
+    private val jwtUtil: JWTUtil,
+    private val objectMapper: ObjectMapper
 ) {
 
     @Bean
@@ -42,7 +45,7 @@ class SecurityConfig(
             }
 
         http
-            .addFilterAt(LoginFilter(authenticationManager, jwtUtil), UsernamePasswordAuthenticationFilter::class.java)
+            .addFilterAt(LoginFilter(authenticationManager, jwtUtil, ResponseWriter(objectMapper)), UsernamePasswordAuthenticationFilter::class.java)
 
         return http.build()
     }
