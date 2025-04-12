@@ -9,14 +9,14 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.AuthenticationException
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
-import team.goodpeople.global.exception.CustomErrorCode
-import team.goodpeople.global.exception.GlobalException
 import team.goodpeople.global.response.ApiResponse
+import team.goodpeople.global.response.ResponseWriter
 import team.goodpeople.security.jwt.JWTUtil
 
 class LoginFilter(
     private val authenticationManager: AuthenticationManager,
-    private val jwtUtil: JWTUtil
+    private val jwtUtil: JWTUtil,
+    private val responseWriter: ResponseWriter
 ) : UsernamePasswordAuthenticationFilter() {
 
     init {
@@ -65,17 +65,12 @@ class LoginFilter(
 
         val result = jwtUtil.convertTokenToResponse(accessToken, refreshToken)
 
-        // TODO: Response 작성 메서드 구현 고려
-        response.status = HttpServletResponse.SC_OK
-        response.contentType = "application/json"
-        response.characterEncoding = "UTF-8"
-
-        val apiResponse = ApiResponse.success(
-            result = result,
-            message = "login successful",)
-
-        val objectMapper = ObjectMapper()
-        response.writer.write(objectMapper.writeValueAsString(apiResponse))
+        responseWriter.writeJsonResponse(
+            response = response,
+            body = ApiResponse.success(
+                result = result
+            )
+        )
     }
 
     override fun unsuccessfulAuthentication(
@@ -83,6 +78,13 @@ class LoginFilter(
         response: HttpServletResponse,
         failed: AuthenticationException
     ) {
-        throw GlobalException(CustomErrorCode.LOGIN_AUTHENTICATION_FAILED)
+        responseWriter.writeJsonResponse(
+            response = response,
+            status = 401,
+            body = ApiResponse.failure<String>(
+                // TODO: CustomErrorCode와 연계가 될 것 같다.
+                status = 400,
+                message = "존재하지 않는 유저입니다.")
+        )
     }
 }
