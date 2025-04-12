@@ -26,4 +26,7 @@ class CustomUserDetails(
     override fun isCredentialsNonExpired(): Boolean = true
 
     override fun isEnabled(): Boolean = true
+
+    /** 추가 */
+    fun getUserID(): Long = requireNotNull(user.id) { "User ID cannot be null." }
 }
