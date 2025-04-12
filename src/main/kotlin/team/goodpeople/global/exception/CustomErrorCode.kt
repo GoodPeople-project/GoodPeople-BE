@@ -15,5 +15,9 @@ enum class CustomErrorCode(
     NICKNAME_DUPLICATED(HttpStatus.UNPROCESSABLE_ENTITY, "중복된 닉네임입니다."),
 
     USER_ALREADY_DELETED(HttpStatus.BAD_REQUEST, "잘못된 요청입니다."),
-    USER_NOT_DELETED(HttpStatus.BAD_REQUEST, "잘못된 요청입니다.")
+    USER_NOT_DELETED(HttpStatus.BAD_REQUEST, "잘못된 요청입니다."),
+
+
+    /** Security */
+    LOGIN_AUTHENTICATION_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "로그인에 실패하였습니다.")
 }
