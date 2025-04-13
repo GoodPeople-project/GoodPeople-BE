@@ -35,6 +35,9 @@ dependencies {
     // MySQL
     runtimeOnly("com.mysql:mysql-connector-j")
 
+    // Redis
+    implementation("org.springframework.boot:spring-boot-starter-data-redis")
+
     // AOP
     implementation("org.springframework.boot:spring-boot-starter-aop")
 
