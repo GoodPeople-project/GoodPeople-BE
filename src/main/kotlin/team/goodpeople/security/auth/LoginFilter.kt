@@ -48,7 +48,7 @@ class LoginFilter(
         chain: FilterChain,
         authResult: Authentication
     ) {
-        // TODO: 성공 로직. UserDetails 구성 고민 및 리프레시 토큰 저장 로직 추가
+        // TODO: 성공 로직. UserDetails 구성 고민
         val authenticatedUser = authResult.principal as CustomUserDetails
 
         val accessToken = jwtUtil.createAccessToken(
@@ -62,6 +62,11 @@ class LoginFilter(
             username = authenticatedUser.username,
             role = authenticatedUser.authorities.toString()
         )
+
+        /** Refresh Token은 Redis에 저장한다.
+         * Access / Refresh Token 모두 body에 담아 응답한다.
+         * TODO: Refresh Token 저장 로직
+         */
 
         val result = jwtUtil.convertTokenToResponse(accessToken, refreshToken)
 
