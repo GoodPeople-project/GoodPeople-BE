@@ -12,11 +12,13 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import team.goodpeople.global.response.ApiResponse
 import team.goodpeople.global.response.ResponseWriter
 import team.goodpeople.security.jwt.JWTUtil
+import team.goodpeople.security.refresh.RefreshService
 
 class LoginFilter(
     private val authenticationManager: AuthenticationManager,
     private val jwtUtil: JWTUtil,
-    private val responseWriter: ResponseWriter
+    private val responseWriter: ResponseWriter,
+    private val refreshService: RefreshService
 ) : UsernamePasswordAuthenticationFilter() {
 
     init {
@@ -28,6 +30,10 @@ class LoginFilter(
         response: HttpServletResponse
     ): Authentication {
 
+        /**
+         * 로그인 요청에서 아이디, 비밀번호를 꺼내 authenticationManager에게 위임.
+         * 추가적인 인증 정보를 요구하지 않으므로, 토큰의 세 번째 인자는 null
+         * */
         val loginRequest = ObjectMapper().readValue(request.inputStream, LoginRequest::class.java)
 
         val username = loginRequest.username
@@ -48,26 +54,31 @@ class LoginFilter(
         chain: FilterChain,
         authResult: Authentication
     ) {
-        // TODO: 성공 로직. UserDetails 구성 고민
+        // TODO: UserDetails 구성 고민
+        /** 인증이 완료된 사용자의 정보를 추출하여 토큰 생성 */
         val authenticatedUser = authResult.principal as CustomUserDetails
 
+        val userId = authenticatedUser.getUserID()
+        val username = authenticatedUser.username
+        val role = authenticatedUser.authorities.toString()
+
         val accessToken = jwtUtil.createAccessToken(
-            userId = authenticatedUser.getUserID(),
-            username = authenticatedUser.username,
-            role = authenticatedUser.authorities.toString()
+            userId = userId,
+            username = username,
+            role = role
         )
 
         val refreshToken = jwtUtil.createRefreshToken(
-            userId = authenticatedUser.getUserID(),
-            username = authenticatedUser.username,
-            role = authenticatedUser.authorities.toString()
+            userId = userId,
+            username = username,
+            role = role
         )
 
-        /** Refresh Token은 Redis에 저장한다.
-         * Access / Refresh Token 모두 body에 담아 응답한다.
-         * TODO: Refresh Token 저장 로직
-         */
+        /** 발급한 Refresh Token은 Redis에 저장한다. */
+        // TODO: Redis에 저장된 토큰의 만료 시간과 실제 만료 시간이 일치하는지 확인할 것.
+        refreshService.saveRefreshToken(username, refreshToken)
 
+        /** Access / Refresh Token 모두 body에 담아 응답한다. */
         val result = jwtUtil.convertTokenToResponse(accessToken, refreshToken)
 
         responseWriter.writeJsonResponse(

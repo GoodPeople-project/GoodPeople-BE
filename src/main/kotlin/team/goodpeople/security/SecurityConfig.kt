@@ -13,13 +13,15 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import team.goodpeople.global.response.ResponseWriter
 import team.goodpeople.security.jwt.JWTUtil
 import team.goodpeople.security.auth.LoginFilter
+import team.goodpeople.security.refresh.RefreshService
 
 @EnableWebSecurity
 @Configuration
 class SecurityConfig(
     private val authenticationConfiguration: AuthenticationConfiguration,
     private val jwtUtil: JWTUtil,
-    private val objectMapper: ObjectMapper
+    private val objectMapper: ObjectMapper,
+    private val refreshService: RefreshService
 ) {
 
     @Bean
@@ -45,7 +47,7 @@ class SecurityConfig(
             }
 
         http
-            .addFilterAt(LoginFilter(authenticationManager, jwtUtil, ResponseWriter(objectMapper)), UsernamePasswordAuthenticationFilter::class.java)
+            .addFilterAt(LoginFilter(authenticationManager, jwtUtil, ResponseWriter(objectMapper), refreshService), UsernamePasswordAuthenticationFilter::class.java)
 
         return http.build()
     }
