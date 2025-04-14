@@ -1,6 +1,7 @@
 package team.goodpeople.security.jwt
 
 import io.jsonwebtoken.Jwts
+import jakarta.servlet.http.HttpServletRequest
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 import team.goodpeople.security.jwt.JWTConstants.ACCESS_CATEGORY
@@ -107,5 +108,15 @@ class JWTUtil(
             "expires_in" to ACCESS_EXPIRED_MS,
             "refresh_token" to refreshToken
         )
+    }
+
+    fun resolveAccessToken(request: HttpServletRequest): String? {
+        val authHeader = request.getHeader("Authorization")
+
+        val accessToken = authHeader
+            ?.takeIf { it.startsWith("$TOKEN_TYPE ") }
+            ?.removePrefix("$TOKEN_TYPE ")
+
+        return accessToken
     }
 }
