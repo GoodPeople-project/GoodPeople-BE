@@ -92,13 +92,26 @@ class User private constructor (
 
     companion object {
         /** 팩토리 메서드 사용으로 생성자 노출 방지 */
-        fun signUpWithForm(
-            username: String,
-            password: String,
-            nickname: String,
-            email: String,
-        ): User {
-            return User(null, username, password, nickname, email)
+        fun signUpWithForm(username: String, password: String, nickname: String, email: String): User
+        {
+            return User(
+            id = null,
+            username = username,
+            password = password,
+            nickname = nickname,
+            email = email)
+        }
+
+        /** JWT 생성을 위한 팩토리 메서드 */
+        fun createEntityForJWT(id: Long, username: String, role: Role): User
+        {
+            return User(
+                id = id,
+                username = username,
+                password = "",
+                nickname = "",
+                email = "",
+                role = role)
         }
     }
 
