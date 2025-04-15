@@ -13,6 +13,9 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import team.goodpeople.global.response.ResponseWriter
 import team.goodpeople.security.jwt.JWTUtil
 import team.goodpeople.security.auth.LoginFilter
+import team.goodpeople.security.jwt.JWTAccessDeniedHandler
+import team.goodpeople.security.jwt.JWTAuthenticationEntryPoint
+import team.goodpeople.security.jwt.JWTFilter
 import team.goodpeople.security.refresh.RefreshService
 
 @EnableWebSecurity
@@ -21,7 +24,9 @@ class SecurityConfig(
     private val authenticationConfiguration: AuthenticationConfiguration,
     private val jwtUtil: JWTUtil,
     private val objectMapper: ObjectMapper,
-    private val refreshService: RefreshService
+    private val refreshService: RefreshService,
+    private val jwtAccessDeniedHandler: JWTAccessDeniedHandler,
+    private val jwtAuthenticationEntryPoint: JWTAuthenticationEntryPoint
 ) {
 
     @Bean
@@ -38,6 +43,13 @@ class SecurityConfig(
             .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
 
         http
+            .exceptionHandling {
+                it
+                    .authenticationEntryPoint(jwtAuthenticationEntryPoint)
+                    .accessDeniedHandler(jwtAccessDeniedHandler)
+            }
+
+        http
             .authorizeHttpRequests {
                 it
                     .requestMatchers("/", "/api/login").permitAll()
@@ -47,6 +59,7 @@ class SecurityConfig(
             }
 
         http
+            .addFilterBefore(JWTFilter(jwtUtil), LoginFilter::class.java)
             .addFilterAt(LoginFilter(authenticationManager, jwtUtil, ResponseWriter(objectMapper), refreshService), UsernamePasswordAuthenticationFilter::class.java)
 
         return http.build()
