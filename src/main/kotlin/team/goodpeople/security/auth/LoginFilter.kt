@@ -32,13 +32,13 @@ class LoginFilter(
 
         /**
          * 로그인 요청에서 아이디, 비밀번호를 꺼내 authenticationManager에게 위임.
-         * 추가적인 인증 정보를 요구하지 않으므로, 토큰의 세 번째 인자는 null
          * */
         val loginRequest = ObjectMapper().readValue(request.inputStream, LoginRequest::class.java)
 
         val username = loginRequest.username
         val password = loginRequest.password
 
+        /** 초기 인증이므로 authorities는 null로 설정한다.*/
         val authenticationToken = UsernamePasswordAuthenticationToken(
             username,
             password,
