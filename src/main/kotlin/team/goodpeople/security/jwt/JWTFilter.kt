@@ -8,12 +8,15 @@ import jakarta.servlet.http.HttpServletResponse
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.web.filter.OncePerRequestFilter
+import team.goodpeople.global.response.ApiResponse
+import team.goodpeople.global.response.ResponseWriter
 import team.goodpeople.security.auth.CustomUserDetails
 import team.goodpeople.user.entity.Role
 import team.goodpeople.user.entity.User
 
 class JWTFilter(
     private val jwtUtil: JWTUtil,
+    private val responseWriter: ResponseWriter
 ) : OncePerRequestFilter() {
 
     override fun doFilterInternal(
@@ -70,11 +73,35 @@ class JWTFilter(
             filterChain.doFilter(request, response)
         // TODO: 예외처리 구체화
         } catch (e: ExpiredJwtException) {
-            // TODO: Response Exception
+            SecurityContextHolder.clearContext()
+            responseWriter.writeJsonResponse(
+                response = response,
+                status = 401,
+                body = ApiResponse.failure<String>(
+                    401,
+                    "Expired Token"
+                )
+            )
         } catch (e: JwtException) {
-            // TODO: Response Exception
+            SecurityContextHolder.clearContext()
+            responseWriter.writeJsonResponse(
+                response = response,
+                status = 401,
+                body = ApiResponse.failure<String>(
+                    401,
+                    "Invalid Token"
+                )
+            )
+        } catch (e: Exception) {
+            SecurityContextHolder.clearContext()
+            responseWriter.writeJsonResponse(
+                response = response,
+                status = 500,
+                body = ApiResponse.failure<String>(
+                    status = 500,
+                    message = "Error during Token Authentication"
+                )
+            )
         }
-
-
     }
 }

@@ -23,10 +23,10 @@ import team.goodpeople.security.refresh.RefreshService
 class SecurityConfig(
     private val authenticationConfiguration: AuthenticationConfiguration,
     private val jwtUtil: JWTUtil,
-    private val objectMapper: ObjectMapper,
     private val refreshService: RefreshService,
     private val jwtAccessDeniedHandler: JWTAccessDeniedHandler,
-    private val jwtAuthenticationEntryPoint: JWTAuthenticationEntryPoint
+    private val jwtAuthenticationEntryPoint: JWTAuthenticationEntryPoint,
+    private val responseWriter: ResponseWriter
 ) {
 
     @Bean
@@ -59,8 +59,8 @@ class SecurityConfig(
             }
 
         http
-            .addFilterBefore(JWTFilter(jwtUtil), LoginFilter::class.java)
-            .addFilterAt(LoginFilter(authenticationManager, jwtUtil, ResponseWriter(objectMapper), refreshService), UsernamePasswordAuthenticationFilter::class.java)
+            .addFilterBefore(JWTFilter(jwtUtil, responseWriter), LoginFilter::class.java)
+            .addFilterAt(LoginFilter(authenticationManager, jwtUtil, responseWriter, refreshService), UsernamePasswordAuthenticationFilter::class.java)
 
         return http.build()
     }
