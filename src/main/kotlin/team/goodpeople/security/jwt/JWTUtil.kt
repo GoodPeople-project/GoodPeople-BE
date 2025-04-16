@@ -47,7 +47,7 @@ class JWTUtil(
 
         return Jwts.builder()
             .claim("type", TOKEN_TYPE)
-            .claim("cat", ACCESS_CATEGORY)
+            .claim("cat", REFRESH_CATEGORY)
             .claim("id", userId)
             .claim("username", username)
             .claim("role", role)
@@ -119,4 +119,6 @@ class JWTUtil(
 
         return accessToken
     }
+
+    // TODO: 검증 로직 메서드화
 }

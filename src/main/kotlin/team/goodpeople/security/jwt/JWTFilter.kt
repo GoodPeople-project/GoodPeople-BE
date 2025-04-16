@@ -47,7 +47,7 @@ class JWTFilter(
             }
 
             /** 토큰 만료 여부 확인 */
-            if (!jwtUtil.isTokenExpired(accessToken)) {
+            if (jwtUtil.isTokenExpired(accessToken)) {
                 return filterChain.doFilter(request, response)
             }
 
