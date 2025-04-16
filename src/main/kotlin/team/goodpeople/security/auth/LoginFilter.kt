@@ -11,6 +11,7 @@ import org.springframework.security.core.AuthenticationException
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
 import team.goodpeople.global.response.ApiResponse
 import team.goodpeople.global.response.ResponseWriter
+import team.goodpeople.security.jwt.CookieUtil.Companion.sendCookie
 import team.goodpeople.security.jwt.JWTUtil
 import team.goodpeople.security.refresh.RefreshService
 
@@ -87,6 +88,12 @@ class LoginFilter(
                 result = result
             )
         )
+
+        /** Refresh Token을 쿠키에 담아 응답한다. */
+        sendCookie(
+            response = response,
+            key = "refresh_token",
+            value = refreshToken)
     }
 
     override fun unsuccessfulAuthentication(
@@ -100,7 +107,7 @@ class LoginFilter(
             body = ApiResponse.failure<String>(
                 // TODO: CustomErrorCode와 연계가 될 것 같다.
                 status = 400,
-                message = "존재하지 않는 유저입니다.")
+                message = "Login failed")
         )
     }
 }
