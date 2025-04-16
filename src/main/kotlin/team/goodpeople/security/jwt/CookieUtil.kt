@@ -50,8 +50,10 @@ class CookieUtil {
         fun getStringFromCookies(
             request: HttpServletRequest,
             key: String
-        ) {
-            request.cookies?.firstOrNull { it.name == key }
+        ): String? {
+            val cookie = request.cookies?.firstOrNull { it.name == key }
+
+            return cookie?.value
         }
     }
 }

@@ -10,7 +10,9 @@ import org.springframework.security.config.http.SessionCreationPolicy
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
+import org.springframework.security.web.authentication.logout.LogoutFilter
 import team.goodpeople.global.response.ResponseWriter
+import team.goodpeople.security.auth.CustomLogoutFilter
 import team.goodpeople.security.jwt.JWTUtil
 import team.goodpeople.security.auth.LoginFilter
 import team.goodpeople.security.jwt.JWTAccessDeniedHandler
@@ -41,6 +43,7 @@ class SecurityConfig(
             .csrf { it.disable() }
             .formLogin { it.disable() }
             .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
+            .logout { it. logoutUrl("/api/auth/logout") }
 
         http
             .exceptionHandling {
@@ -61,6 +64,7 @@ class SecurityConfig(
         http
             .addFilterBefore(JWTFilter(jwtUtil, responseWriter), LoginFilter::class.java)
             .addFilterAt(LoginFilter(authenticationManager, jwtUtil, responseWriter, refreshService), UsernamePasswordAuthenticationFilter::class.java)
+            .addFilterBefore(CustomLogoutFilter(refreshService, jwtUtil, responseWriter), LogoutFilter::class.java )
 
         return http.build()
     }
