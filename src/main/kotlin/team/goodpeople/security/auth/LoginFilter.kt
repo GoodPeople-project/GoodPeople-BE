@@ -23,7 +23,7 @@ class LoginFilter(
 ) : UsernamePasswordAuthenticationFilter() {
 
     init {
-        setFilterProcessesUrl("/api/login")
+        setFilterProcessesUrl("/api/auth/login")
     }
 
     override fun attemptAuthentication(
