@@ -26,3 +26,10 @@ spring:
   ### Security ###
   jwt:
     secret: ${JWT_SECRET}
+  security:
+    oauth2:
+      client:
+        registration:
+          naver:
+            client-id: ${NAVER_CLIENT_ID}
+            client-secret: ${NAVER_CLIENT_SECRET}
