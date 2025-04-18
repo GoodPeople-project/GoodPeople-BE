@@ -24,20 +24,8 @@ class JWTFilter(
         response: HttpServletResponse,
         filterChain: FilterChain
     ) {
-        /**
-         * Access Token 검증 로직
-         * - 실패 시 early return 후, 다음 필터로 넘어간다.
-         * */
-
-        /**
-         * resolveAccessToken 메서드
-         * - 헤더 검증 및 Access Token을 추출한다.
-         * - null이면
-         * 1. 인증 헤더를 가져온다.
-         * 2. Prefix가 TOKEN_TYPE과 일치하는지 확인한다.
-         * 3. Prefix를 제거하여 순수한 토큰 문자열을 획득한다.
-         * */
         try {
+            /** Auth 헤더에서 Access Token 추출 */
             val accessToken: String = jwtUtil.resolveAccessToken(request)
                 ?: return filterChain.doFilter(request, response)
 
@@ -57,7 +45,7 @@ class JWTFilter(
              * */
             val username = jwtUtil.getClaim(accessToken, "username")
             val role = jwtUtil.getClaim(accessToken, "role")
-            val userId = jwtUtil.getClaim(accessToken, "id").toLong()
+            val userId = jwtUtil.getClaim(accessToken, "id", Long::class.java)
 
             val user = User.createEntityForJWT(
                 id = userId,

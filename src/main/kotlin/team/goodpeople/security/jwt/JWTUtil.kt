@@ -21,6 +21,7 @@ class JWTUtil(
     private val secretKey: SecretKey =
         SecretKeySpec(Base64.getDecoder().decode(secret), "HmacSHA256")
 
+    /** JWT 생성 */
     fun createAccessToken(
         userId: Long,
         username: String,
@@ -57,6 +58,7 @@ class JWTUtil(
             .compact()
     }
 
+    /** Claim 추출 */
     fun getClaim(
         jwtToken: String,
         claim: String
@@ -68,6 +70,21 @@ class JWTUtil(
             .parseSignedClaims(jwtToken)
             .payload
             .get(claim, String::class.java)
+    }
+
+    // String 이외의 타입 오버로딩
+    fun <T> getClaim(
+        jwtToken: String,
+        claim: String,
+        clazz: Class<T>
+    ): T {
+
+        return Jwts.parser()
+            .verifyWith(secretKey)
+            .build()
+            .parseSignedClaims(jwtToken)
+            .payload
+            .get(claim, clazz)
     }
 
     fun isAccessToken(
@@ -119,6 +136,4 @@ class JWTUtil(
 
         return accessToken
     }
-
-    // TODO: 검증 로직 메서드화
 }
