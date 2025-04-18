@@ -1,6 +1,5 @@
 package team.goodpeople.security
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration
@@ -55,8 +54,8 @@ class SecurityConfig(
         http
             .authorizeHttpRequests {
                 it
-                    .requestMatchers("/", "/api/login").permitAll()
-                    .requestMatchers("/api/admin", "/api/admin/**").hasRole("ADMIN")
+                    .requestMatchers("/api/auth/**", "/").permitAll()
+                    .requestMatchers("/api/admin/**").hasRole("ADMIN")
                     .requestMatchers(("/api/user/**")).permitAll()
                     .anyRequest().permitAll()
             }
