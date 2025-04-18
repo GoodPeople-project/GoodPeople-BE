@@ -4,11 +4,11 @@ import io.jsonwebtoken.Jwts
 import jakarta.servlet.http.HttpServletRequest
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
-import team.goodpeople.security.jwt.JWTConstants.ACCESS_CATEGORY
-import team.goodpeople.security.jwt.JWTConstants.ACCESS_EXPIRED_MS
-import team.goodpeople.security.jwt.JWTConstants.REFRESH_CATEGORY
-import team.goodpeople.security.jwt.JWTConstants.TOKEN_TYPE
-import team.goodpeople.security.jwt.JWTConstants.REFRESH_EXPIRED_MS
+import team.goodpeople.security.AuthConstants.ACCESS_CATEGORY
+import team.goodpeople.security.AuthConstants.ACCESS_EXPIRED_MS
+import team.goodpeople.security.AuthConstants.REFRESH_CATEGORY
+import team.goodpeople.security.AuthConstants.TOKEN_TYPE
+import team.goodpeople.security.AuthConstants.REFRESH_EXPIRED_MS
 import java.util.*
 import javax.crypto.SecretKey
 import javax.crypto.spec.SecretKeySpec

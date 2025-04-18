@@ -3,11 +3,11 @@ package team.goodpeople.security.jwt
 import jakarta.servlet.http.Cookie
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
-import team.goodpeople.security.jwt.JWTConstants.COOKIE_DOMAIN
-import team.goodpeople.security.jwt.JWTConstants.COOKIE_HTTP_ONLY
-import team.goodpeople.security.jwt.JWTConstants.COOKIE_MAX_AGE
-import team.goodpeople.security.jwt.JWTConstants.COOKIE_PATH
-import team.goodpeople.security.jwt.JWTConstants.COOKIE_SET_SECURE
+import team.goodpeople.security.AuthConstants.COOKIE_DOMAIN
+import team.goodpeople.security.AuthConstants.COOKIE_HTTP_ONLY
+import team.goodpeople.security.AuthConstants.COOKIE_MAX_AGE
+import team.goodpeople.security.AuthConstants.COOKIE_PATH
+import team.goodpeople.security.AuthConstants.COOKIE_SET_SECURE
 
 class CookieUtil {
 

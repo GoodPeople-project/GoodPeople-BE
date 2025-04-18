@@ -10,7 +10,7 @@ import team.goodpeople.global.response.ApiResponse
 import team.goodpeople.global.response.ResponseWriter
 import team.goodpeople.security.jwt.CookieUtil.Companion.getStringFromCookies
 import team.goodpeople.security.jwt.CookieUtil.Companion.sendCookie
-import team.goodpeople.security.jwt.JWTConstants.REFRESH_EXPIRED_MS
+import team.goodpeople.security.AuthConstants.REFRESH_EXPIRED_MS
 import team.goodpeople.security.jwt.JWTUtil
 import java.time.Duration
 

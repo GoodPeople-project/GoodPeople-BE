@@ -1,6 +1,6 @@
-package team.goodpeople.security.jwt
+package team.goodpeople.security
 
-object JWTConstants {
+object AuthConstants {
 
     /** - Common Constants */
     const val TOKEN_TYPE: String = "Bearer"
