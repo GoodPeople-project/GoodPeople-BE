@@ -2,7 +2,10 @@ package team.goodpeople.security
 
 object AuthConstants {
 
-    /** - Common Constants */
+    /** Security Common Constants */
+    const val DEVELOP_BASE_URL: String = "http://localhost:8080"
+
+    /** - JWT Common Constants */
     const val TOKEN_TYPE: String = "Bearer"
 
     /** - Access Token Constants */
