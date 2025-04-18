@@ -83,7 +83,7 @@ class RefreshService(
             throw JwtException("Refresh Token does not match")
         }
 
-        val userId = jwtUtil.getClaim(oldRefreshToken, "id").toLong()
+        val userId = jwtUtil.getClaim(oldRefreshToken, "id", Integer::class.java).toLong()
         val role = jwtUtil.getClaim(oldRefreshToken, "role")
 
         val newAccessToken = jwtUtil.createAccessToken(

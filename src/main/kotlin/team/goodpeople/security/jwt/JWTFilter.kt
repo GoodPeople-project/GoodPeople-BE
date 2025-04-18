@@ -45,7 +45,7 @@ class JWTFilter(
              * */
             val username = jwtUtil.getClaim(accessToken, "username")
             val role = jwtUtil.getClaim(accessToken, "role")
-            val userId = jwtUtil.getClaim(accessToken, "id", Long::class.java)
+            val userId = jwtUtil.getClaim(accessToken, "id", Integer::class.java).toLong()
 
             val user = User.createEntityForJWT(
                 id = userId,
