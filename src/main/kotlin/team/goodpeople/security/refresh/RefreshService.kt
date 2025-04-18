@@ -1,15 +1,25 @@
 package team.goodpeople.security.refresh
 
+import io.jsonwebtoken.JwtException
+import jakarta.servlet.http.HttpServletRequest
+import jakarta.servlet.http.HttpServletResponse
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.stereotype.Service
+import team.goodpeople.global.response.ApiResponse
+import team.goodpeople.global.response.ResponseWriter
+import team.goodpeople.security.jwt.CookieUtil.Companion.getStringFromCookies
+import team.goodpeople.security.jwt.CookieUtil.Companion.sendCookie
 import team.goodpeople.security.jwt.JWTConstants.REFRESH_EXPIRED_MS
+import team.goodpeople.security.jwt.JWTUtil
 import java.time.Duration
 
 @Service
 class RefreshService(
     @Qualifier("redisRefreshTemplate")
-    private val redisTemplate: RedisTemplate<String, String>
+    private val redisTemplate: RedisTemplate<String, String>,
+    private val jwtUtil: JWTUtil,
+    private val responseWriter: ResponseWriter,
 ) {
     /**
      * Redis에 저장될 Refresh Token
@@ -55,4 +65,59 @@ class RefreshService(
        redisTemplate.delete(key)
     }
 
+    /** Access Token 재발급 */
+    fun reissueAccessToken(
+        request: HttpServletRequest,
+        response: HttpServletResponse
+    ): Boolean {
+        /** 쿠키에서 기존 Refresh Token 추출 */
+        val oldRefreshToken: String = getStringFromCookies(request, "refresh_token")
+            ?: throw JwtException("No Refresh Token found")
+
+        /** username으로 Redis에 저장된 Refresh Token을 조회한다. */
+        val username = jwtUtil.getClaim(oldRefreshToken, "username")
+        val savedRefreshToken = getRefreshToken(username)
+
+        /** 요청의 Refresh Token과 값 비교 */
+        if (savedRefreshToken != oldRefreshToken) {
+            throw JwtException("Refresh Token does not match")
+        }
+
+        val userId = jwtUtil.getClaim(oldRefreshToken, "id").toLong()
+        val role = jwtUtil.getClaim(oldRefreshToken, "role")
+
+        val newAccessToken = jwtUtil.createAccessToken(
+            userId = userId,
+            username = username,
+            role = role
+        )
+
+        val newRefreshToken = jwtUtil.createRefreshToken(
+            userId = userId,
+            username = username,
+            role = role
+        )
+
+        /** 발급한 Refresh Token은 Redis에 저장한다. */
+        // TODO: Redis에 저장된 토큰의 만료 시간과 실제 만료 시간이 일치하는지 확인할 것.
+        saveRefreshToken(username, newRefreshToken)
+
+        /** Access / Refresh Token 모두 body에 담아 응답한다. */
+        val result = jwtUtil.convertTokenToResponse(newAccessToken, newRefreshToken)
+
+        responseWriter.writeJsonResponse(
+            response = response,
+            body = ApiResponse.success(
+                result = result
+            )
+        )
+
+        /** Refresh Token을 쿠키에 담아 응답한다. */
+        sendCookie(
+            response = response,
+            key = "refresh_token",
+            value = oldRefreshToken)
+
+        return true
+    }
 }
