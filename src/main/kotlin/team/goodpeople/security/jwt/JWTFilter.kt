@@ -43,6 +43,12 @@ class JWTFilter(
              * 검증 후 Context에 사용자 등록
              * 팩토리 메서드로 user 객체를 생성하여 Details에 넘긴다.
              * */
+            /*TODO: OAuth2 이식하기
+            *  현재 UserDetails를 상속한 CustomUserDetails에 정보를 담은 후,
+            *  ContextHolder에 저장하고 있음.
+            *  로그인 방식이 두 가지임을 고려하여 공통 DTO를 작성할지,
+            *  로그인 방식에 따라 DTO를 다르게 할지 고려 필요
+            * */
             val username = jwtUtil.getClaim(accessToken, "username")
             val role = jwtUtil.getClaim(accessToken, "role")
             val userId = jwtUtil.getClaim(accessToken, "id", Integer::class.java).toLong()
