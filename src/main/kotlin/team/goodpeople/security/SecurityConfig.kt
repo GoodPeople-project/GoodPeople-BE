@@ -2,6 +2,7 @@ package team.goodpeople.security
 
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
@@ -17,6 +18,10 @@ import team.goodpeople.security.auth.LoginFilter
 import team.goodpeople.security.jwt.JWTAccessDeniedHandler
 import team.goodpeople.security.jwt.JWTAuthenticationEntryPoint
 import team.goodpeople.security.jwt.JWTFilter
+import team.goodpeople.security.oauth2.CustomOAuth2AuthorizedClientService
+import team.goodpeople.security.oauth2.CustomOAuth2UserService
+import team.goodpeople.security.oauth2.OAuth2SuccessHandler
+import team.goodpeople.security.oauth2.SocialClientRegistrationRepo
 import team.goodpeople.security.refresh.RefreshService
 
 @EnableWebSecurity
@@ -27,7 +32,14 @@ class SecurityConfig(
     private val refreshService: RefreshService,
     private val jwtAccessDeniedHandler: JWTAccessDeniedHandler,
     private val jwtAuthenticationEntryPoint: JWTAuthenticationEntryPoint,
-    private val responseWriter: ResponseWriter
+    private val responseWriter: ResponseWriter,
+
+    private val socialClientRegistrationRepo: SocialClientRegistrationRepo,
+    private val customOAuth2AuthorizedClientService: CustomOAuth2AuthorizedClientService,
+    private val clientRegistrationRepo: SocialClientRegistrationRepo,
+    private val jdbcTemplate: JdbcTemplate,
+    private val customOAuth2UserService: CustomOAuth2UserService,
+    private val oAuth2SuccessHandler: OAuth2SuccessHandler
 ) {
 
     @Bean
@@ -43,6 +55,14 @@ class SecurityConfig(
             .formLogin { it.disable() }
             .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
             .logout { it. logoutUrl("/api/auth/logout") }
+            .oauth2Login {
+                it
+                    .authorizationEndpoint { it.baseUri("/oauth2/authorization") }
+                    .clientRegistrationRepository(socialClientRegistrationRepo.ClientRegistrationRepository())
+                    .authorizedClientService(customOAuth2AuthorizedClientService.oAuth2AuthorizedClientService(jdbcTemplate, clientRegistrationRepo.ClientRegistrationRepository()))
+                    .userInfoEndpoint { it.userService(customOAuth2UserService)}
+                    .successHandler(oAuth2SuccessHandler)
+            }
 
         http
             .exceptionHandling {
@@ -54,7 +74,7 @@ class SecurityConfig(
         http
             .authorizeHttpRequests {
                 it
-                    .requestMatchers("/api/auth/**", "/").permitAll()
+                    .requestMatchers("/api/auth/**", "/oauth2/**", "/").permitAll()
                     .requestMatchers("/api/admin/**").hasRole("ADMIN")
                     .requestMatchers(("/api/user/**")).permitAll()
                     .anyRequest().permitAll()
