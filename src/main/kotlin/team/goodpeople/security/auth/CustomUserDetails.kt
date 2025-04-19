@@ -28,5 +28,7 @@ class CustomUserDetails(
     override fun isEnabled(): Boolean = true
 
     /** 추가 */
+    fun getUser(): User = user
+
     fun getUserID(): Long = requireNotNull(user.id) { "User ID cannot be null." }
 }
