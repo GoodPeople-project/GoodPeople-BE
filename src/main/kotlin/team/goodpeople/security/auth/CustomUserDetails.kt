@@ -3,21 +3,23 @@ package team.goodpeople.security.auth
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
+import team.goodpeople.common.BaseDetails
 import team.goodpeople.user.entity.User
 
-// TODO: 정보 관리 방식 - 객체를 담을지, 필드를 따로 가져와서 관리할지.
 class CustomUserDetails(
-    private val user: User,
-) : UserDetails {
-
-    override fun getAuthorities(): Collection<GrantedAuthority> {
-        return listOf(SimpleGrantedAuthority(user.role.name))
-    }
+    private val username: String,
+    private val password: String,
+    private val userId: Long,
+    private val role: String
+) : UserDetails, BaseDetails {
 
     /** 필수 구현 메서드 */
-    override fun getPassword(): String = user.password
+    override fun getAuthorities(): Collection<GrantedAuthority> {
+        return listOf(SimpleGrantedAuthority(this.role))}
 
-    override fun getUsername(): String = user.username
+    override fun getPassword(): String = this.password
+
+    override fun getUsername(): String = this.username
 
     override fun isAccountNonExpired(): Boolean = true
 
@@ -27,8 +29,7 @@ class CustomUserDetails(
 
     override fun isEnabled(): Boolean = true
 
-    /** 추가 */
-    fun getUser(): User = user
-
-    fun getUserID(): Long = requireNotNull(user.id) { "User ID cannot be null." }
+    /** 공통 속성 관리 */
+    override fun getUserId(): Long = this.userId
+    override fun getRole(): String = this.role
 }

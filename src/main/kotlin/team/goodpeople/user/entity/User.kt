@@ -1,5 +1,6 @@
 package team.goodpeople.user.entity
 
+import jakarta.annotation.Nullable
 import jakarta.persistence.*
 import jakarta.validation.constraints.NotNull
 import jakarta.validation.constraints.Pattern
@@ -79,40 +80,56 @@ class User private constructor (
     @field:NotNull
     @field:Enumerated(EnumType.STRING)
     @field:Column(name = "role")
-    var role: Role = Role.ROLE_USER
+    var role: Role = Role.ROLE_USER,
+
+//    TODO: LoginType 프로퍼티 추가
+//    @field:NotNull
+//    @field:Enumerated(EnumType.STRING)
+//    @field:Column(name = "login_type")
+//    val loginType: LoginType
+
 ) : BaseEntity() {
-    @field:NotNull
+    @field:Nullable
     @field:Size(min = 8)
     @field:Column(name = "password")
     var password = password
         private set
 
     /** 기본 생성자 */
-    protected constructor() : this(null, "", "", "", "")
+    protected constructor() : this(
+        id = null,
+        username = "",
+        password = "",
+        nickname = "",
+        email = "",
+//        loginType = LoginType.FORM
+    )
 
     companion object {
         /** 팩토리 메서드 사용으로 생성자 노출 방지 */
-        fun signUpWithForm(username: String, password: String, nickname: String, email: String): User
-        {
+        fun signUpWithForm(username: String, password: String, nickname: String, email: String): User {
             return User(
-            id = null,
-            username = username,
-            password = password,
-            nickname = nickname,
-            email = email)
+                id = null,
+                username = username,
+                password = password,
+                nickname = nickname,
+                email = email,
+//                loginType = LoginType.FORM
+            )
         }
 
         /** JWT 생성을 위한 팩토리 메서드 */
-        fun createEntityForJWT(id: Long, username: String, role: Role): User
-        {
-            return User(
-                id = id,
-                username = username,
-                password = "",
-                nickname = "",
-                email = "",
-                role = role)
-        }
+        // TODO: DTO 클래스 새로 만들어서 사용할 것
+//        fun createEntityForJWT(id: Long, username: String, role: Role): User
+//        {
+//            return User(
+//                id = id,
+//                username = username,
+//                password = "",
+//                nickname = "",
+//                email = "",
+//                role = role)
+//        }
     }
 
     fun updateNickname(nickname: String) {

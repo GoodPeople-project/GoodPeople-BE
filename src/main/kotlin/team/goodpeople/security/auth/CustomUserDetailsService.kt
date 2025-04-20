@@ -13,8 +13,16 @@ class CustomUserDetailsService(
 
     override fun loadUserByUsername(username: String): UserDetails {
 
-        val user = userRepository.findUserByUsername(username) ?: throw UsernameNotFoundException("사용자를 찾을 수 없습니다.")
+        val user = userRepository.findUserByUsername(username)
+            ?: throw UsernameNotFoundException("사용자를 찾을 수 없습니다.")
 
-        return CustomUserDetails(user)
+        val userDetails = CustomUserDetails(
+            username = user.username,
+            password = user.password,
+            userId = user.id ?: throw UsernameNotFoundException(username),
+            role = user.role.toString()
+        )
+
+        return userDetails
     }
 }

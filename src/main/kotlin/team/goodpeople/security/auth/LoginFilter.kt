@@ -59,9 +59,9 @@ class LoginFilter(
         /** 인증이 완료된 사용자의 정보를 추출하여 토큰 생성 */
         val authenticatedUser = authResult.principal as CustomUserDetails
 
-        val userId = authenticatedUser.getUserID()
-        val username = authenticatedUser.username
-        val role = authenticatedUser.authorities.toString()
+        val userId = authenticatedUser.getUserId()
+        val username = authenticatedUser.getUsername()
+        val role = authenticatedUser.getRole()
 
         val accessToken = jwtUtil.createAccessToken(
             userId = userId,
