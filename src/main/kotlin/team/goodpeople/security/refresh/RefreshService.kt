@@ -12,6 +12,7 @@ import team.goodpeople.security.jwt.CookieUtil.Companion.getStringFromCookies
 import team.goodpeople.security.jwt.CookieUtil.Companion.sendCookie
 import team.goodpeople.security.AuthConstants.REFRESH_EXPIRED_MS
 import team.goodpeople.security.jwt.JWTUtil
+import team.goodpeople.security.jwt.dto.UserInfoDto
 import java.time.Duration
 
 @Service
@@ -83,20 +84,10 @@ class RefreshService(
             throw JwtException("Refresh Token does not match")
         }
 
-        val userId = jwtUtil.getClaim(oldRefreshToken, "id", Integer::class.java).toLong()
-        val role = jwtUtil.getClaim(oldRefreshToken, "role")
+        val userInfo = jwtUtil.getClaim(oldRefreshToken, "user", UserInfoDto::class.java)
 
-        val newAccessToken = jwtUtil.createAccessToken(
-            userId = userId,
-            username = username,
-            role = role
-        )
-
-        val newRefreshToken = jwtUtil.createRefreshToken(
-            userId = userId,
-            username = username,
-            role = role
-        )
+        val newAccessToken = jwtUtil.createAccessToken(userInfo)
+        val newRefreshToken = jwtUtil.createRefreshToken(userInfo)
 
         /** 발급한 Refresh Token은 Redis에 저장한다. */
         // TODO: Redis에 저장된 토큰의 만료 시간과 실제 만료 시간이 일치하는지 확인할 것.

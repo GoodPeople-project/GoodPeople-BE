@@ -10,7 +10,8 @@ class CustomUserDetails(
     private val username: String,
     private val password: String,
     private val userId: Long,
-    private val role: String
+    private val role: String,
+    private val loginType: String
 ) : UserDetails, BaseDetails {
 
     /** 필수 구현 메서드 */
@@ -32,4 +33,5 @@ class CustomUserDetails(
     /** 공통 속성 관리 */
     override fun getUserId(): Long = this.userId
     override fun getRole(): String = this.role
+    override fun getLoginType(): String = this.loginType
 }

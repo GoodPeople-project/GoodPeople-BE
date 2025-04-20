@@ -1,5 +1,6 @@
 package team.goodpeople.security.oauth2
 
+import com.nimbusds.openid.connect.sdk.claims.UserInfo
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import org.springframework.security.core.Authentication
@@ -10,6 +11,7 @@ import team.goodpeople.global.response.ApiResponse
 import team.goodpeople.global.response.ResponseWriter
 import team.goodpeople.security.jwt.CookieUtil.Companion.sendCookie
 import team.goodpeople.security.jwt.JWTUtil
+import team.goodpeople.security.jwt.dto.UserInfoDto
 import team.goodpeople.security.refresh.RefreshService
 
 @Component
@@ -31,18 +33,16 @@ class OAuth2SuccessHandler(
             val userId = oAuth2User.attributes["id"].toString().toLong()
             val username = oAuth2User.attributes["username"] as String
             val role = oAuth2User.attributes["roles"].toString() // as List<String>
+            val loginType = "SOCIAL"
 
-            val accessToken = jwtUtil.createAccessToken(
+            val userInfo = UserInfoDto(
                 userId = userId,
                 username = username,
-                role = role
-            )
+                role = role,
+                loginType = loginType)
 
-            val refreshToken = jwtUtil.createRefreshToken(
-                userId = userId,
-                username = username,
-                role = role
-            )
+            val accessToken = jwtUtil.createAccessToken(userInfo)
+            val refreshToken = jwtUtil.createRefreshToken(userInfo)
 
             /** 발급한 Refresh Token은 Redis에 저장한다. */
             refreshService.saveRefreshToken(username, refreshToken)

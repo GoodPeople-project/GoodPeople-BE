@@ -13,6 +13,7 @@ import team.goodpeople.global.response.ApiResponse
 import team.goodpeople.global.response.ResponseWriter
 import team.goodpeople.security.jwt.CookieUtil.Companion.sendCookie
 import team.goodpeople.security.jwt.JWTUtil
+import team.goodpeople.security.jwt.dto.UserInfoDto
 import team.goodpeople.security.refresh.RefreshService
 
 class LoginFilter(
@@ -55,25 +56,23 @@ class LoginFilter(
         chain: FilterChain,
         authResult: Authentication
     ) {
-        // TODO: UserDetails 구성 고민
         /** 인증이 완료된 사용자의 정보를 추출하여 토큰 생성 */
         val authenticatedUser = authResult.principal as CustomUserDetails
 
         val userId = authenticatedUser.getUserId()
         val username = authenticatedUser.getUsername()
         val role = authenticatedUser.getRole()
+        val loginType = authenticatedUser.getLoginType()
 
-        val accessToken = jwtUtil.createAccessToken(
+        val userInfo = UserInfoDto(
+            username= username,
             userId = userId,
-            username = username,
-            role = role
+            role = role,
+            loginType = loginType
         )
 
-        val refreshToken = jwtUtil.createRefreshToken(
-            userId = userId,
-            username = username,
-            role = role
-        )
+        val accessToken = jwtUtil.createAccessToken(userInfo)
+        val refreshToken = jwtUtil.createRefreshToken(userInfo)
 
         /** 발급한 Refresh Token은 Redis에 저장한다. */
         // TODO: Redis에 저장된 토큰의 만료 시간과 실제 만료 시간이 일치하는지 확인할 것.

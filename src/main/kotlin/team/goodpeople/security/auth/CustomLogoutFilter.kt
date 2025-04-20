@@ -41,7 +41,6 @@ class CustomLogoutFilter(
             request, "refresh_token")
             ?: return filterChain.doFilter(request, response)
 
-        /** TODO: 유효성 검증 로직 합쳐서 JWTFilter에서 재사용하기 */
         /** cat이 Access Token을 나타내는지 확인 */
         if (!jwtUtil.isRefreshToken(refreshToken)) {
             return filterChain.doFilter(request, response)
@@ -53,7 +52,8 @@ class CustomLogoutFilter(
         }
 
         /** Request의 Refresh Token으로, Redis 내부의 동일한 토큰을 조회 */
-        val username = jwtUtil.getClaim(refreshToken, "username")
+        val userInfo = jwtUtil.parseUserInfo(refreshToken)
+        val username = userInfo.username
 
         refreshService.getRefreshToken(username)
 

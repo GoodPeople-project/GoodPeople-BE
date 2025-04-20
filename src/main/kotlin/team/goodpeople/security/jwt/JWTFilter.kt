@@ -10,9 +10,9 @@ import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.web.filter.OncePerRequestFilter
 import team.goodpeople.global.response.ApiResponse
 import team.goodpeople.global.response.ResponseWriter
+import team.goodpeople.security.AuthConstants.MASKED_PASSWORD
 import team.goodpeople.security.auth.CustomUserDetails
-import team.goodpeople.user.entity.Role
-import team.goodpeople.user.entity.User
+import team.goodpeople.security.jwt.dto.UserInfoDto
 
 class JWTFilter(
     private val jwtUtil: JWTUtil,
@@ -49,15 +49,18 @@ class JWTFilter(
             *  로그인 방식이 두 가지임을 고려하여 공통 DTO를 작성할지,
             *  로그인 방식에 따라 DTO를 다르게 할지 고려 필요
             * */
-            val username = jwtUtil.getClaim(accessToken, "username")
-            val role = jwtUtil.getClaim(accessToken, "role")
-            val userId = jwtUtil.getClaim(accessToken, "id", Integer::class.java).toLong()
+            val userInfo = jwtUtil.getClaim(accessToken, "user", UserInfoDto::class.java)
 
-            val user = User.createEntityForJWT(
-                id = userId,
-                username = username,
-                role = Role.valueOf(role))
-            val userDetails = CustomUserDetails(user)
+
+
+            // TODO: OAuth2일 경우, OAuth2User로 저장하도록 분기
+            val userDetails = CustomUserDetails(
+                username = userInfo.username,
+                password = MASKED_PASSWORD,
+                userId = userInfo.userId,
+                role = userInfo.role,
+                loginType = userInfo.loginType
+            )
 
             val authenticationToken = UsernamePasswordAuthenticationToken(userDetails, null)
 

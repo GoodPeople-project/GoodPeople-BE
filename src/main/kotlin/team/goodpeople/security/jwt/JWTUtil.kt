@@ -1,5 +1,6 @@
 package team.goodpeople.security.jwt
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import io.jsonwebtoken.Jwts
 import jakarta.servlet.http.HttpServletRequest
 import org.springframework.beans.factory.annotation.Value
@@ -9,13 +10,15 @@ import team.goodpeople.security.AuthConstants.ACCESS_EXPIRED_MS
 import team.goodpeople.security.AuthConstants.REFRESH_CATEGORY
 import team.goodpeople.security.AuthConstants.TOKEN_TYPE
 import team.goodpeople.security.AuthConstants.REFRESH_EXPIRED_MS
+import team.goodpeople.security.jwt.dto.UserInfoDto
 import java.util.*
 import javax.crypto.SecretKey
 import javax.crypto.spec.SecretKeySpec
 
 @Component
 class JWTUtil(
-    @Value("\${jwt.secret}") private val secret: String
+    @Value("\${jwt.secret}") private val secret: String,
+    private val objectMapper: ObjectMapper
 ) {
 
     private val secretKey: SecretKey =
@@ -23,17 +26,13 @@ class JWTUtil(
 
     /** JWT 생성 */
     fun createAccessToken(
-        userId: Long,
-        username: String,
-        role: String
+        userInfo: UserInfoDto,
     ): String {
 
         return Jwts.builder()
             .claim("type", TOKEN_TYPE)
             .claim("cat", ACCESS_CATEGORY)
-            .claim("id", userId)
-            .claim("username", username)
-            .claim("role", role)
+            .claim("user", userInfo)
             .issuedAt(Date(System.currentTimeMillis()))
             .expiration(Date(System.currentTimeMillis()  + ACCESS_EXPIRED_MS))
             .signWith(secretKey)
@@ -41,17 +40,13 @@ class JWTUtil(
     }
 
     fun createRefreshToken(
-        userId: Long,
-        username: String,
-        role: String
+        userInfo: UserInfoDto,
     ): String {
 
         return Jwts.builder()
             .claim("type", TOKEN_TYPE)
             .claim("cat", REFRESH_CATEGORY)
-            .claim("id", userId)
-            .claim("username", username)
-            .claim("role", role)
+            .claim("user", userInfo)
             .issuedAt(Date(System.currentTimeMillis()))
             .expiration(Date(System.currentTimeMillis()  + REFRESH_EXPIRED_MS))
             .signWith(secretKey)
@@ -85,6 +80,14 @@ class JWTUtil(
             .parseSignedClaims(jwtToken)
             .payload
             .get(claim, clazz)
+    }
+
+    /** 토큰에 담긴 사용자 정보를 파싱하는 메서드 */
+    fun parseUserInfo(jwtToken: String): UserInfoDto {
+        val userInfoClaim = getClaim(jwtToken, "user", LinkedHashMap::class.java)
+        val parsedUserInfo = objectMapper.convertValue(userInfoClaim, UserInfoDto::class.java)
+
+        return parsedUserInfo
     }
 
     fun isAccessToken(

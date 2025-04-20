@@ -10,6 +10,7 @@ class CustomOAuth2User(
 //    private val attributes: Map<String, Any>,
 ) : OAuth2User {
 
+    /** 필수 구현 메서드 */
     override fun getAttributes(): Map<String, Any> = attributes
 
     override fun getAuthorities(): Collection<GrantedAuthority> {

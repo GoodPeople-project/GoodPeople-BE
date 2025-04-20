@@ -5,4 +5,5 @@ interface BaseDetails {
     fun getUsername(): String
     fun getUserId(): Long
     fun getRole(): String
+    fun getLoginType(): String
 }

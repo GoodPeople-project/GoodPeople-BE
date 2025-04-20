@@ -38,7 +38,7 @@ class CustomOAuth2UserService(
         if (savedUser == null) {
             // TODO: 유저 생성
             // TODO: 보안 문제. password 프로퍼티가 존재하므로 폼 로그인이 가능하긴 하다. 테이블을 나누거나 폼 로그인에서 따로 처리가 필요할 듯
-            val newUser = User.signUpWithForm(
+            val newUser = User.signUpWithOAuth2(
                 username = username,
                 password = "",
                 nickname = getTempNickname(),

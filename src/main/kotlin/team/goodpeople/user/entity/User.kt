@@ -82,11 +82,16 @@ class User private constructor (
     @field:Column(name = "role")
     var role: Role = Role.ROLE_USER,
 
-//    TODO: LoginType 프로퍼티 추가
-//    @field:NotNull
-//    @field:Enumerated(EnumType.STRING)
-//    @field:Column(name = "login_type")
-//    val loginType: LoginType
+    /**
+     * @property loginType
+     * - 로그인 타입을 구분한다.
+     * - 폼 로그인 -> "FORM"
+     * - 소셜 로그인(OAuth2) -> "SOCIAL"
+     * */
+    @field:NotNull
+    @field:Enumerated(EnumType.STRING)
+    @field:Column(name = "login_type")
+    val loginType: LoginType
 
 ) : BaseEntity() {
     @field:Nullable
@@ -102,34 +107,31 @@ class User private constructor (
         password = "",
         nickname = "",
         email = "",
-//        loginType = LoginType.FORM
+        loginType = LoginType.FORM
     )
 
     companion object {
-        /** 팩토리 메서드 사용으로 생성자 노출 방지 */
+        /** 폼 회원가입 팩토리 메서드 */
         fun signUpWithForm(username: String, password: String, nickname: String, email: String): User {
             return User(
-                id = null,
                 username = username,
                 password = password,
                 nickname = nickname,
                 email = email,
-//                loginType = LoginType.FORM
+                loginType = LoginType.FORM
             )
         }
 
-        /** JWT 생성을 위한 팩토리 메서드 */
-        // TODO: DTO 클래스 새로 만들어서 사용할 것
-//        fun createEntityForJWT(id: Long, username: String, role: Role): User
-//        {
-//            return User(
-//                id = id,
-//                username = username,
-//                password = "",
-//                nickname = "",
-//                email = "",
-//                role = role)
-//        }
+        /** OAuth2 회원가입 팩토리 메서드 */
+        fun signUpWithOAuth2(username: String, password: String, nickname: String, email: String): User {
+            return User(
+                username = username,
+                password = password,
+                nickname = nickname,
+                email = email,
+                loginType = LoginType.SOCIAL
+            )
+        }
     }
 
     fun updateNickname(nickname: String) {

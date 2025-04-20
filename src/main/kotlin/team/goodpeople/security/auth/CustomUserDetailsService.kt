@@ -20,7 +20,8 @@ class CustomUserDetailsService(
             username = user.username,
             password = user.password,
             userId = user.id ?: throw UsernameNotFoundException(username),
-            role = user.role.toString()
+            role = user.role.toString(),
+            loginType = user.loginType.toString()
         )
 
         return userDetails
