@@ -30,10 +30,13 @@ class AuthController(
 
     /**
      * 내부 로직으로 생성되는 엔드포인트
-     * - 로그인
+     * - 폼 로그인
      * @PostMapping("/login")
      *
-     * - 로그아웃
+     * - 소셜 로그인
+     * @URL ("/oauth2/authorization/{provider}")
+     *
+     * - 공통 로그아웃
      * @PostMapping("/logout")
      * */
 }
