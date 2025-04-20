@@ -4,6 +4,9 @@ object AuthConstants {
 
     /** Security Common Constants */
     const val DEVELOP_BASE_URL: String = "http://localhost:8080"
+    val ALLOWED_ORIGIN: List<String> = listOf("localhost:8080")
+    val ALLOWED_METHOD: List<String> = listOf("GET", "POST", "PUT", "PATCH", "DELETE")
+
     const val MASKED_PASSWORD: String = "**********"
 
     /** - JWT Common Constants */

@@ -33,6 +33,7 @@ class SecurityConfig(
     private val jwtAccessDeniedHandler: JWTAccessDeniedHandler,
     private val jwtAuthenticationEntryPoint: JWTAuthenticationEntryPoint,
     private val responseWriter: ResponseWriter,
+    private val corsConfig: CorsConfig,
 
     private val socialClientRegistrationRepo: SocialClientRegistrationRepo,
     private val customOAuth2AuthorizedClientService: CustomOAuth2AuthorizedClientService,
@@ -54,6 +55,7 @@ class SecurityConfig(
             .csrf { it.disable() }
             .formLogin { it.disable() }
             .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
+            .cors { it.configurationSource(corsConfig) }
             .logout { it. logoutUrl("/api/auth/logout") }
             .oauth2Login {
                 it
