@@ -21,7 +21,6 @@ class GlobalExceptionHandler {
     /* 그 외 예외 응답 */
     @ExceptionHandler(Exception::class)
     fun handleUnexpectedException(e: Exception): ResponseEntity<ApiResponse<Nothing>> {
-        e.printStackTrace()
         val status = HttpStatus.INTERNAL_SERVER_ERROR.value()
         return ResponseEntity
             .status(status)
