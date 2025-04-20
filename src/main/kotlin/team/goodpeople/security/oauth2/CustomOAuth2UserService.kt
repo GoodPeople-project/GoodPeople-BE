@@ -4,6 +4,7 @@ import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserServ
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest
 import org.springframework.security.oauth2.core.user.OAuth2User
 import org.springframework.stereotype.Service
+import team.goodpeople.security.AuthConstants.MASKED_PASSWORD
 import team.goodpeople.security.oauth2.dto.CustomOAuth2User
 import team.goodpeople.security.oauth2.dto.NaverResponse
 import team.goodpeople.user.entity.User
@@ -33,25 +34,46 @@ class CustomOAuth2UserService(
         }
 
         val username = oAuth2Response.getProvider() + " " + oAuth2Response.getProviderId()
-        val savedUser = userRepository.findUserByUsername(username)
+        val user = userRepository.findUserByUsername(username)
 
-        if (savedUser == null) {
-            // TODO: 유저 생성
+        /** DB에서 조회되지 않는 최초 로그인인 경우, 소셜 로그인 회원 정보를 저장한다. */
+        if (user == null) {
             // TODO: 보안 문제. password 프로퍼티가 존재하므로 폼 로그인이 가능하긴 하다. 테이블을 나누거나 폼 로그인에서 따로 처리가 필요할 듯
-            val newUser = User.signUpWithOAuth2(
-                username = username,
-                password = "",
-                nickname = getTempNickname(),
-                email = oAuth2Response.getEmail(),
+            val newUser = userRepository.save(
+                User.signUpWithOAuth2(
+                    username = username,
+                    password = MASKED_PASSWORD,
+                    nickname = getTempNickname(),
+                    email = oAuth2Response.getEmail()
+                )
             )
 
             userRepository.save(newUser)
 
-            return CustomOAuth2User(newUser)
+            val savedUser = userRepository.findUserByUsername(username)
+                ?: throw Exception()
+
+            // TODO: 예외처리
+            return CustomOAuth2User(
+                username = savedUser.username,
+                userId = savedUser.id ?: throw Exception("id null"),
+                role = savedUser.role.toString(),
+                loginType = savedUser.loginType.toString(),
+                attributes = oAuth2User.attributes,
+            )
         }
         else {
+            // TODO: 최초 로그인이 아닌 경우
+            val savedUser = userRepository.findUserByUsername(username)
+                ?: throw Exception()
 
-            return CustomOAuth2User(savedUser)
+            return CustomOAuth2User(
+                username = savedUser.username,
+                userId = savedUser.id ?: throw Exception("id null"),
+                role = savedUser.role.toString(),
+                loginType = savedUser.loginType.toString(),
+                attributes = oAuth2User.attributes,
+            )
         }
     }
 

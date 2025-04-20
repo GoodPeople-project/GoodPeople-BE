@@ -12,6 +12,7 @@ import team.goodpeople.global.response.ResponseWriter
 import team.goodpeople.security.jwt.CookieUtil.Companion.sendCookie
 import team.goodpeople.security.jwt.JWTUtil
 import team.goodpeople.security.jwt.dto.UserInfoDto
+import team.goodpeople.security.oauth2.dto.CustomOAuth2User
 import team.goodpeople.security.refresh.RefreshService
 
 @Component
@@ -27,13 +28,13 @@ class OAuth2SuccessHandler(
         authentication: Authentication
     ) {
         try {
-            val oAuth2User = authentication.principal as OAuth2User
+            val oAuth2User = authentication.principal as CustomOAuth2User
 
             // TODO: 덜 번거롭게 변환 가능한지
-            val userId = oAuth2User.attributes["id"].toString().toLong()
-            val username = oAuth2User.attributes["username"] as String
-            val role = oAuth2User.attributes["roles"].toString() // as List<String>
-            val loginType = "SOCIAL"
+            val userId = oAuth2User.getUserId()
+            val username = oAuth2User.getUsername()
+            val role = oAuth2User.getRole() // as List<String>
+            val loginType = oAuth2User.getLoginType()
 
             val userInfo = UserInfoDto(
                 userId = userId,
