@@ -44,4 +44,4 @@ out/
 /gradlew
 /gradlew.bat
 /src/test/kotlin/team/goodpeople/GoodpeopleApplicationTests.kt
-/my.env
+/back.env
