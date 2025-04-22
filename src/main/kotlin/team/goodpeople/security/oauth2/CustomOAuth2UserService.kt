@@ -6,6 +6,8 @@ import org.springframework.security.oauth2.core.user.OAuth2User
 import org.springframework.stereotype.Service
 import team.goodpeople.security.AuthConstants.MASKED_PASSWORD
 import team.goodpeople.security.oauth2.dto.CustomOAuth2User
+import team.goodpeople.security.oauth2.dto.GoogleResponse
+import team.goodpeople.security.oauth2.dto.KakaoResponse
 import team.goodpeople.security.oauth2.dto.NaverResponse
 import team.goodpeople.user.entity.User
 import team.goodpeople.user.repository.UserRepository
@@ -25,6 +27,8 @@ class CustomOAuth2UserService(
 
         val oAuth2Response = when(registrationId) {
             "naver" -> NaverResponse(oAuth2User.attributes)
+            "google" -> GoogleResponse(oAuth2User.attributes)
+            "kakao" -> KakaoResponse(oAuth2User.attributes)
             else -> null
         }
 
@@ -33,7 +37,7 @@ class CustomOAuth2UserService(
             throw Exception()
         }
 
-        val username = oAuth2Response.getProvider() + " " + oAuth2Response.getProviderId()
+        val username = oAuth2Response.getProvider() + "_" + oAuth2Response.getProviderId()
         val user = userRepository.findUserByUsername(username)
 
         /** DB에서 조회되지 않는 최초 로그인인 경우, 소셜 로그인 회원 정보를 저장한다. */
