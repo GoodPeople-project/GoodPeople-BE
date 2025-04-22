@@ -12,7 +12,9 @@ class SocialClientRegistrationRepo(
     @Bean
     fun ClientRegistrationRepository(): ClientRegistrationRepository {
         return InMemoryClientRegistrationRepository(
-            socialClientRegistration.naverClientRegistration()
+            socialClientRegistration.naverClientRegistration(),
+            socialClientRegistration.kakaoClientRegistration(),
+            socialClientRegistration.googleClientRegistration()
         )
     }
 }
