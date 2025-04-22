@@ -83,11 +83,15 @@ class JWTUtil(
     }
 
     /** 토큰에 담긴 사용자 정보를 파싱하는 메서드 */
-    fun parseUserInfo(jwtToken: String): UserInfoDto {
-        val userInfoClaim = getClaim(jwtToken, "user", LinkedHashMap::class.java)
-        val parsedUserInfo = objectMapper.convertValue(userInfoClaim, UserInfoDto::class.java)
+    fun <T> getNestedClaim(
+        jwtToken: String,
+        claim: String,
+        clazz: Class<T>
+    ): T {
+        val nestedClaim = getClaim(jwtToken, claim, LinkedHashMap::class.java)
+        val convertedClaim = objectMapper.convertValue(nestedClaim, clazz)
 
-        return parsedUserInfo
+        return convertedClaim
     }
 
     fun isAccessToken(

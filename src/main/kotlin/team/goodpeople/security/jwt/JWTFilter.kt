@@ -49,9 +49,7 @@ class JWTFilter(
             *  로그인 방식이 두 가지임을 고려하여 공통 DTO를 작성할지,
             *  로그인 방식에 따라 DTO를 다르게 할지 고려 필요
             * */
-            val userInfo = jwtUtil.getClaim(accessToken, "user", UserInfoDto::class.java)
-
-
+            val userInfo = jwtUtil.getNestedClaim(accessToken, "user", UserInfoDto::class.java)
 
             // TODO: OAuth2일 경우, OAuth2User로 저장하도록 분기
             val userDetails = CustomUserDetails(
@@ -66,6 +64,8 @@ class JWTFilter(
 
             /** Security Context Holder에 저장 */
             SecurityContextHolder.getContext().authentication = authenticationToken
+
+            request.setAttribute("user", userInfo)
 
             filterChain.doFilter(request, response)
         // TODO: 예외처리 구체화

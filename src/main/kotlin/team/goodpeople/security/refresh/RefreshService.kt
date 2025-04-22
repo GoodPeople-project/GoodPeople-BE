@@ -75,16 +75,16 @@ class RefreshService(
         val oldRefreshToken: String = getStringFromCookies(request, "refresh_token")
             ?: throw JwtException("No Refresh Token found")
 
+        val userInfo = jwtUtil.getNestedClaim(oldRefreshToken, "user", UserInfoDto::class.java)
+
         /** username으로 Redis에 저장된 Refresh Token을 조회한다. */
-        val username = jwtUtil.getClaim(oldRefreshToken, "username")
+        val username = userInfo.username
         val savedRefreshToken = getRefreshToken(username)
 
         /** 요청의 Refresh Token과 값 비교 */
         if (savedRefreshToken != oldRefreshToken) {
             throw JwtException("Refresh Token does not match")
         }
-
-        val userInfo = jwtUtil.getClaim(oldRefreshToken, "user", UserInfoDto::class.java)
 
         val newAccessToken = jwtUtil.createAccessToken(userInfo)
         val newRefreshToken = jwtUtil.createRefreshToken(userInfo)
@@ -107,7 +107,7 @@ class RefreshService(
         sendCookie(
             response = response,
             key = "refresh_token",
-            value = oldRefreshToken)
+            value = newRefreshToken)
 
         return true
     }

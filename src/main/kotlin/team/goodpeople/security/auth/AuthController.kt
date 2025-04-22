@@ -18,14 +18,8 @@ class AuthController(
     fun reissueAccess(
         request: HttpServletRequest,
         response: HttpServletResponse,
-    ): ApiResponse<Boolean> {
-        val result = refreshService.reissueAccessToken(request, response)
-
-        return ApiResponse.success(
-            result = result,
-            status = 200,
-            message = "Reissue Successful"
-        )
+    ): Unit {
+        refreshService.reissueAccessToken(request, response)
     }
 
     /**

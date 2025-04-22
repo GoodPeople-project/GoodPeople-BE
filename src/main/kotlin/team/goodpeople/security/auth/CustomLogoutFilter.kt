@@ -9,6 +9,7 @@ import team.goodpeople.global.response.ResponseWriter
 import team.goodpeople.security.jwt.CookieUtil.Companion.deleteCookie
 import team.goodpeople.security.jwt.CookieUtil.Companion.getStringFromCookies
 import team.goodpeople.security.jwt.JWTUtil
+import team.goodpeople.security.jwt.dto.UserInfoDto
 import team.goodpeople.security.refresh.RefreshService
 
 class CustomLogoutFilter(
@@ -52,7 +53,7 @@ class CustomLogoutFilter(
         }
 
         /** Request의 Refresh Token으로, Redis 내부의 동일한 토큰을 조회 */
-        val userInfo = jwtUtil.parseUserInfo(refreshToken)
+        val userInfo = jwtUtil.getNestedClaim(refreshToken, "user", UserInfoDto::class.java)
         val username = userInfo.username
 
         refreshService.getRefreshToken(username)
