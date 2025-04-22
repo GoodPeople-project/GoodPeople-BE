@@ -19,8 +19,8 @@ class UserController(private val userService: UserService) {
     ): ApiResponse<Boolean> {
 
         return ApiResponse.success(
-            userService.signUp(dto),
-            HttpStatus.CREATED.value())
+            result = userService.signUp(dto),
+            status = HttpStatus.CREATED.value())
     }
 
     @PatchMapping("/nickname/{userId}")
@@ -31,14 +31,14 @@ class UserController(private val userService: UserService) {
 
         return if (userService.updateNickname(userId, dto)) {
             ApiResponse.success(
-                true,
-                HttpStatus.NO_CONTENT.value()
+                result = true,
+                status = HttpStatus.NO_CONTENT.value()
             )
         } else {
             ApiResponse.success(
-                true,
-                HttpStatus.NOT_MODIFIED.value(),
-                "변경 사항이 없습니다.")
+                result = true,
+                status = HttpStatus.NOT_MODIFIED.value(),
+                message = "변경 사항이 없습니다.")
         }
     }
 
@@ -48,8 +48,8 @@ class UserController(private val userService: UserService) {
     ): ApiResponse<Boolean> {
 
         return ApiResponse.success(
-            userService.checkNicknameDuplication(dto),
-            HttpStatus.OK.value()
+            result = userService.checkNicknameDuplication(dto),
+            status = HttpStatus.OK.value()
         )
     }
 
@@ -61,14 +61,14 @@ class UserController(private val userService: UserService) {
 
         return if (userService.updatePassword(userId, dto)) {
             ApiResponse.success(
-                true,
-                HttpStatus.NO_CONTENT.value()
+                result = true,
+                status = HttpStatus.NO_CONTENT.value()
             )
         } else {
             ApiResponse.success(
-                true,
-                HttpStatus.NOT_MODIFIED.value(),
-                "변경 사항이 없습니다."
+                result = true,
+                status = HttpStatus.NOT_MODIFIED.value(),
+                message = "변경 사항이 없습니다."
             )
         }
     }
@@ -79,8 +79,8 @@ class UserController(private val userService: UserService) {
     ): ApiResponse<Boolean> {
 
         return ApiResponse.success(
-            userService.softDeleteUser(userId),
-            HttpStatus.OK.value()
+            result = userService.softDeleteUser(userId),
+            status = HttpStatus.OK.value()
         )
     }
 
@@ -90,8 +90,8 @@ class UserController(private val userService: UserService) {
     ): ApiResponse<Boolean> {
 
         return ApiResponse.success(
-            userService.recoverUser(userId),
-            HttpStatus.OK.value()
+            result = userService.recoverUser(userId),
+            status = HttpStatus.OK.value()
         )
     }
 
@@ -101,8 +101,8 @@ class UserController(private val userService: UserService) {
     ): ApiResponse<Boolean> {
 
         return ApiResponse.success(
-            userService.hardDeleteUser(userId),
-            HttpStatus.NO_CONTENT.value()
+            result = userService.hardDeleteUser(userId),
+            status = HttpStatus.NO_CONTENT.value()
         )
     }
 }

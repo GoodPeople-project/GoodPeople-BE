@@ -22,22 +22,23 @@ class User private constructor (
      * @property id
      * - DB 관리용 ID
      * - Long 타입의 자동 생성 값이다.
+     * - DB에서는 null이 될 수 없음을 명시했다.
      * - 조회 가능 / 수정 불가능
      */
     @field:Id
     @field:GeneratedValue(strategy = GenerationType.IDENTITY)
-    @field:Column(name = "id")
+    @field:Column(name = "id", nullable = false)
     val id: Long? = null,
 
     /**
      * @property username
-     * - 5자 ~ 50자
-     * - 폼 로그인 회원가입 시, ID로 사용한다.
-     * - OAuth2 로그인 시, username을 받아온다.
+     * - 5자 ~ 100자
+     * - 폼 로그인 회원가입 시, ID로 사용하는 이메일 값을 저장한다.
+     * - OAuth2 로그인 시, 식별자를 가져와 저장한다.
      * - 조회 가능 / 수정 불가능
      */
     @field:NotNull
-    @field:Size(min = 5, max = 50)
+    @field:Size(min = 5, max = 100)
     @field:Column(name = "username", unique = true)
     val username: String,
 
@@ -65,9 +66,8 @@ class User private constructor (
      * - 정보성 메일 수신 등, 서비스 이용을 위해 사용한다.
      * - 조회 가능 / 수정 가능
      */
-    @field:NotNull
+    @field:Nullable
     @field:Size(max = 100)
-    @field:Pattern(regexp = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$")
     @field:Column(name = "email", unique = true)
     var email: String,
 
@@ -112,12 +112,12 @@ class User private constructor (
 
     companion object {
         /** 폼 회원가입 팩토리 메서드 */
-        fun signUpWithForm(username: String, password: String, nickname: String, email: String): User {
+        fun signUpWithForm(username: String, password: String, nickname: String): User {
             return User(
                 username = username,
                 password = password,
                 nickname = nickname,
-                email = email,
+                email = "",
                 loginType = LoginType.FORM
             )
         }

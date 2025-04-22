@@ -16,6 +16,7 @@ class UserService(
     private val bCryptPasswordEncoder: BCryptPasswordEncoder
 ) {
 
+    /** 폼 회원가입 */
     fun signUp(
         dto: SignUpRequest
     ): Boolean {
@@ -28,7 +29,6 @@ class UserService(
             username = dto.username,
             password = bCryptPasswordEncoder.encode(dto.password),
             nickname = dto.nickname,
-            email = dto.email
         )
 
         userRepository.save(newUser)
@@ -36,6 +36,14 @@ class UserService(
         return true
     }
 
+    /** 이메일 중복 검사 */
+    fun checkIsEmailDuplicated(
+        email: String,
+    ): Boolean {
+        return userRepository.existsByUsername(email)
+    }
+
+    /** 닉네임 변경 */
     fun updateNickname(
         userId: Long,
         dto: UpdateNicknameRequest
@@ -67,6 +75,7 @@ class UserService(
         return true
     }
 
+    /** 닉네임 중복 검사 */
     fun checkNicknameDuplication(
         dto: UpdateNicknameRequest
     ): Boolean {
@@ -74,6 +83,7 @@ class UserService(
         return userRepository.existsByNickname(dto.nickname)
     }
 
+    /** 비밀번호 변경 */
     fun updatePassword(
         userId: Long,
         dto: UpdatePasswordRequest
@@ -96,6 +106,7 @@ class UserService(
         return true
     }
 
+    /** 유저 Soft Delete */
     fun softDeleteUser(
         userId: Long
     ): Boolean {
@@ -110,6 +121,7 @@ class UserService(
         return true
     }
 
+    /** Soft Delete 된 유저 복구 */
     fun recoverUser(
         userId: Long
     ): Boolean {
@@ -124,6 +136,7 @@ class UserService(
         return true
     }
 
+    /** 유저 Hard Delete */
     fun hardDeleteUser(
         userId: Long
     ): Boolean {
