@@ -4,6 +4,7 @@ import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
 import team.goodpeople.global.response.ApiResponse
+import team.goodpeople.security.jwt.annotation.GetUserId
 import team.goodpeople.user.dto.SignUpRequest
 import team.goodpeople.user.dto.UpdateNicknameRequest
 import team.goodpeople.user.dto.UpdatePasswordRequest
@@ -15,7 +16,7 @@ class UserController(private val userService: UserService) {
 
     @PostMapping
     fun signUp(
-            @RequestBody @Valid dto: SignUpRequest
+        @RequestBody @Valid dto: SignUpRequest
     ): ApiResponse<Boolean> {
 
         return ApiResponse.success(
@@ -23,10 +24,10 @@ class UserController(private val userService: UserService) {
             status = HttpStatus.CREATED.value())
     }
 
-    @PatchMapping("/nickname/{userId}")
+    @PatchMapping("/nickname")
     fun updateNickname(
-            @PathVariable userId: Long,
-            @RequestBody @Valid dto: UpdateNicknameRequest
+        @GetUserId userId: Long,
+        @RequestBody @Valid dto: UpdateNicknameRequest
     ): ApiResponse<Boolean> {
 
         return if (userService.updateNickname(userId, dto)) {
@@ -53,10 +54,10 @@ class UserController(private val userService: UserService) {
         )
     }
 
-    @PatchMapping(("/password/{userId}"))
+    @PatchMapping(("/password"))
     fun updatePassword(
-            @PathVariable userId: Long,
-            @RequestBody @Valid dto: UpdatePasswordRequest
+        @GetUserId userId: Long,
+        @RequestBody @Valid dto: UpdatePasswordRequest
     ): ApiResponse<Boolean> {
 
         return if (userService.updatePassword(userId, dto)) {
