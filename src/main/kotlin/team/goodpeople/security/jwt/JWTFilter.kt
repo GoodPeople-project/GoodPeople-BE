@@ -48,6 +48,7 @@ class JWTFilter(
             *  ContextHolder에 저장하고 있음.
             *  로그인 방식이 두 가지임을 고려하여 공통 DTO를 작성할지,
             *  로그인 방식에 따라 DTO를 다르게 할지 고려 필요
+            *  근데 여기서 역직렬화를 굳이 하는 이유가 있냐?
             * */
             val userInfo = jwtUtil.getNestedClaim(accessToken, "user", UserInfoDto::class.java)
 

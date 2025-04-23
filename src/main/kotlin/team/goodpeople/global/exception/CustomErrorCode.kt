@@ -19,5 +19,7 @@ enum class CustomErrorCode(
 
 
     /** Security */
-    LOGIN_AUTHENTICATION_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "로그인에 실패하였습니다.")
+    LOGIN_AUTHENTICATION_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "로그인에 실패하였습니다."),
+
+    INVALID_ATTRIBUTE(HttpStatus.UNAUTHORIZED, "유효하지 않은 값입니다.")
 }
