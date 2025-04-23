@@ -22,7 +22,9 @@ class CustomLogoutFilter(
      * 로그아웃 요청이 유효한지 검증한다.
      * 유효하지 않으면 필터를 실행하지 않는다.
      * */
-    override fun shouldNotFilter(request: HttpServletRequest): Boolean {
+    override fun shouldNotFilter(
+        request: HttpServletRequest
+    ): Boolean {
         return !isLogoutRequest(request)
     }
 

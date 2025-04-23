@@ -22,6 +22,8 @@ import team.goodpeople.security.oauth2.CustomOAuth2AuthorizedClientService
 import team.goodpeople.security.oauth2.CustomOAuth2UserService
 import team.goodpeople.security.oauth2.OAuth2SuccessHandler
 import team.goodpeople.security.oauth2.SocialClientRegistrationRepo
+import team.goodpeople.security.path.SecurityPath.AUTH_WHITELIST
+import team.goodpeople.security.path.SecurityPath.ONLY_ADMIN_WHITELIST
 import team.goodpeople.security.refresh.RefreshService
 
 @EnableWebSecurity
@@ -76,8 +78,8 @@ class SecurityConfig(
         http
             .authorizeHttpRequests {
                 it
-                    .requestMatchers("/api/auth/**", "/oauth2/**", "/").permitAll()
-                    .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                    .requestMatchers(*AUTH_WHITELIST).permitAll()
+                    .requestMatchers(*ONLY_ADMIN_WHITELIST).hasRole("ADMIN")
                     .requestMatchers(("/api/user/**")).permitAll()
                     .anyRequest().permitAll()
             }

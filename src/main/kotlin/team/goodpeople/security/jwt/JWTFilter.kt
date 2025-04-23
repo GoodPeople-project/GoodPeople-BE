@@ -13,11 +13,19 @@ import team.goodpeople.global.response.ResponseWriter
 import team.goodpeople.security.AuthConstants.MASKED_PASSWORD
 import team.goodpeople.security.auth.CustomUserDetails
 import team.goodpeople.security.jwt.dto.UserInfoDto
+import team.goodpeople.security.path.SecurityPath.AUTH_WHITELIST
+import team.goodpeople.security.path.SecurityPath.isWhitelistedURI
 
 class JWTFilter(
     private val jwtUtil: JWTUtil,
     private val responseWriter: ResponseWriter
 ) : OncePerRequestFilter() {
+
+    override fun shouldNotFilter(
+        request: HttpServletRequest
+    ): Boolean {
+        return isWhitelistedURI(request, AUTH_WHITELIST)
+    }
 
     override fun doFilterInternal(
         request: HttpServletRequest,
@@ -102,4 +110,16 @@ class JWTFilter(
             )
         }
     }
+
+//    private fun isWhitelisted(
+//        request: HttpServletRequest
+//    ): Boolean {
+//
+//        val matcher = AntPathMatcher()
+//        val requestURI = request.requestURI
+//
+//        return AUTH_WHITELIST.any { pattern ->
+//            matcher.match(pattern, requestURI)
+//        }
+//    }
 }
