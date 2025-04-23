@@ -4,6 +4,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.stereotype.Service
 import team.goodpeople.global.exception.CustomErrorCode
 import team.goodpeople.global.exception.GlobalException
+import team.goodpeople.mail.service.SendEmailService
+import team.goodpeople.user.dto.EmailDto
 import team.goodpeople.user.dto.SignUpRequest
 import team.goodpeople.user.dto.UpdateNicknameRequest
 import team.goodpeople.user.dto.UpdatePasswordRequest
@@ -13,7 +15,8 @@ import team.goodpeople.user.repository.UserRepository
 @Service
 class UserService(
     private val userRepository: UserRepository,
-    private val bCryptPasswordEncoder: BCryptPasswordEncoder
+    private val bCryptPasswordEncoder: BCryptPasswordEncoder,
+    private val sendEmailService: SendEmailService
 ) {
 
     /** 폼 회원가입 */
@@ -32,6 +35,51 @@ class UserService(
         )
 
         userRepository.save(newUser)
+
+        return true
+    }
+
+    /** 이메일 인증 번호 전송 */
+    fun sendEmailAuthenticationCode(
+        userId: Long,
+        dto: EmailDto
+    ): Boolean {
+        /** 요청 유저 유효성 검증 */
+        if (!userRepository.existsById(userId)) {
+            throw GlobalException(CustomErrorCode.USER_NOT_EXISTS)
+        }
+
+        /** 이메일 중복 재검사 */
+        val newEmail = dto.email
+        if (userRepository.existsByEmail(newEmail)) {
+            throw GlobalException(CustomErrorCode.EMAIL_DUPLICATED)
+        }
+
+        /** 인증 번호 생성 */
+        val authenticationCode = generateAuthenticationCode()
+
+        /** 이메일 내용 작성 */
+        val emailMessage = sendEmailService.createMail(
+            to = newEmail,
+            subject = "[GoodPeople] 이메일 인증 번호를 입력해주세요.",
+            //TODO: 해당 화면으로 리다이렉트 해주는 링크
+            content = """
+                GoodPeople에서 이메일 인증 번호를 보내드립니다.
+                이메일 인증 번호를 입력하여, 이메일 변경을 완료해주세요.
+                $authenticationCode
+            """.trimIndent()
+        )
+
+        /** 이메일 전송 */
+        try {
+            sendEmailService.sendMail(emailMessage)
+            //TODO: 예외처리
+        } catch (e: Exception) {
+            throw GlobalException(CustomErrorCode.INTERNAL_SERVER_ERROR)
+        }
+
+        /** 인증 번호 저장 */
+        //TODO: Redis 저장
 
         return true
     }
@@ -56,7 +104,7 @@ class UserService(
             .orElseThrow { throw GlobalException(CustomErrorCode.USER_NOT_EXISTS) }
 
         /** 중복 재검사 */
-        if (checkNicknameDuplication(dto)) {
+        if (checkIsNicknameDuplicated(dto)) {
             throw GlobalException(CustomErrorCode.NICKNAME_DUPLICATED)
         }
 
@@ -76,7 +124,7 @@ class UserService(
     }
 
     /** 닉네임 중복 검사 */
-    fun checkNicknameDuplication(
+    fun checkIsNicknameDuplicated(
         dto: UpdateNicknameRequest
     ): Boolean {
 
@@ -148,4 +196,14 @@ class UserService(
         return true
     }
 
+
+    /** 인증번호 생성 */
+    private fun generateAuthenticationCode(
+        length: Int = 6
+    ): String {
+        val authenticationCode = ""
+        return (1..length)
+            .map { (0..9).random() }
+            .joinToString { authenticationCode }
+    }
 }

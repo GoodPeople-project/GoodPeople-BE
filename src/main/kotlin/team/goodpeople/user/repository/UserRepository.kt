@@ -14,4 +14,6 @@ interface UserRepository : CrudRepository<User, Long> {
     fun findUserByUsername(username: String): User?
 
     fun deleteUserById(userId: Long)
+
+    fun existsByEmail(email: String): Boolean
 }
