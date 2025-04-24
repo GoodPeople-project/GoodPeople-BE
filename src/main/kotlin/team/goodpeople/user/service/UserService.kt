@@ -16,7 +16,8 @@ import team.goodpeople.user.repository.UserRepository
 class UserService(
     private val userRepository: UserRepository,
     private val bCryptPasswordEncoder: BCryptPasswordEncoder,
-    private val sendEmailService: SendEmailService
+    private val sendEmailService: SendEmailService,
+    private val authenticationCodeService: AuthenticationCodeService
 ) {
 
     /** 폼 회원가입 */
@@ -41,14 +42,8 @@ class UserService(
 
     /** 이메일 인증 번호 전송 */
     fun sendEmailAuthenticationCode(
-        userId: Long,
         dto: EmailDto
     ): Boolean {
-        /** 요청 유저 유효성 검증 */
-        if (!userRepository.existsById(userId)) {
-            throw GlobalException(CustomErrorCode.USER_NOT_EXISTS)
-        }
-
         /** 이메일 중복 재검사 */
         val newEmail = dto.email
         if (userRepository.existsByEmail(newEmail)) {
@@ -62,13 +57,15 @@ class UserService(
         val emailMessage = sendEmailService.createMail(
             to = newEmail,
             subject = "[GoodPeople] 이메일 인증 번호를 입력해주세요.",
-            //TODO: 해당 화면으로 리다이렉트 해주는 링크
             content = """
                 GoodPeople에서 이메일 인증 번호를 보내드립니다.
                 이메일 인증 번호를 입력하여, 이메일 변경을 완료해주세요.
                 $authenticationCode
             """.trimIndent()
         )
+
+        /** Redis에 인증 번호 저장 */
+        authenticationCodeService.saveEmailAuthCode(newEmail, authenticationCode)
 
         /** 이메일 전송 */
         try {
@@ -77,9 +74,6 @@ class UserService(
         } catch (e: Exception) {
             throw GlobalException(CustomErrorCode.INTERNAL_SERVER_ERROR)
         }
-
-        /** 인증 번호 저장 */
-        //TODO: Redis 저장
 
         return true
     }
