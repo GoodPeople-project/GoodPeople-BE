@@ -125,6 +125,16 @@ class UserController(private val userService: UserService) {
         }
     }
 
+    /**
+     * 이메일 인증 처리 완료
+     *
+     * @param emailAuthDto
+     * - email: 이메일 형식의 문자열
+     * - emailAuthCode: 이메일로 전송된 6자리의 인증 번호 문자열
+     * @return
+     * - 올바른 인증 번호 입력 시, OK 응답과 인증 완료 메시지
+     * - 잘못된 인증 번호 입력 시, OK 응답과 인증 실패 메시지
+     */
     @PostMapping("/email/code")
     fun matchEmailAuthenticationCode(
         @RequestBody @Valid emailAuthDto: EmailAuthDto
@@ -142,7 +152,7 @@ class UserController(private val userService: UserService) {
         else {
             ApiResponse.success(
                 result = false,
-                status = HttpStatus.BAD_REQUEST.value(),
+                status = HttpStatus.OK.value(),
                 message = "인증 번호가 일치하지 않습니다."
             )
         }
