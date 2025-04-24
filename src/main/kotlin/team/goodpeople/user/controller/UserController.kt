@@ -96,9 +96,8 @@ class UserController(private val userService: UserService) {
     }
 
     /**
-     * 이메일 인증 번호 전송
+     * 회원 가입 시 이메일 인증 번호 전송
      *
-     * @param userId 어노테이션으로 획득
      * @param emailDto 등록을 원하는 이메일이 담긴 DTO 클래스
      * - email: 이메일 형식의 문자열
      * @return
@@ -107,11 +106,11 @@ class UserController(private val userService: UserService) {
      */
     @PostMapping("/email")
     fun sendEmailAuthenticationCode(
-        @GetUserId userId: Long,
         @RequestBody @Valid emailDto: EmailDto
     ): ApiResponse<Boolean> {
 
-        val result = userService.sendEmailAuthenticationCode(userId, emailDto)
+        // TODO: 프론트에서 인증 번호 요청 시간을 저장, 값을 받아서 키로 사용하면 될 듯
+        val result = userService.sendEmailAuthenticationCode(emailDto)
 
         return if (result) {
             ApiResponse.success(

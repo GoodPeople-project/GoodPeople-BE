@@ -28,4 +28,8 @@ object AuthConstants {
 
     const val COOKIE_HTTP_ONLY: Boolean = true
     const val COOKIE_SET_SECURE: Boolean = true
+
+
+    /** Authentication Code Constants */
+    const val EMAIL_CODE_EXPIRED_MS: Long = 5 * 60 * 1000L // 5분
 }
