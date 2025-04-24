@@ -5,10 +5,7 @@ import org.springframework.stereotype.Service
 import team.goodpeople.global.exception.CustomErrorCode
 import team.goodpeople.global.exception.GlobalException
 import team.goodpeople.mail.service.SendEmailService
-import team.goodpeople.user.dto.EmailDto
-import team.goodpeople.user.dto.SignUpRequest
-import team.goodpeople.user.dto.UpdateNicknameRequest
-import team.goodpeople.user.dto.UpdatePasswordRequest
+import team.goodpeople.user.dto.*
 import team.goodpeople.user.entity.User.Companion.signUpWithForm
 import team.goodpeople.user.repository.UserRepository
 
@@ -41,6 +38,7 @@ class UserService(
     }
 
     /** 이메일 인증 번호 전송 */
+    // TODO: 재전송
     fun sendEmailAuthenticationCode(
         dto: EmailDto
     ): Boolean {
@@ -74,6 +72,28 @@ class UserService(
         } catch (e: Exception) {
             throw GlobalException(CustomErrorCode.INTERNAL_SERVER_ERROR)
         }
+
+        return true
+    }
+
+    /** 이메일 인증 완료 처리 */
+    fun matchEmailAuthenticationCode(
+        dto: EmailAuthDto
+    ): Boolean {
+        // 입력값 획득
+        val newEmail = dto.email
+        val emailAuthCode = dto.emailAuthCode
+
+        // Redis에 저장된 코드 조회
+        val savedEmailAuthCode = authenticationCodeService.getEmailAuthCode(newEmail)
+
+        // 동등성 확인
+        if (emailAuthCode != savedEmailAuthCode) {
+            return false
+        }
+
+        // 일치하면 Redis에 저장된 값 삭제
+        authenticationCodeService.deleteEmailAuthCode(newEmail)
 
         return true
     }

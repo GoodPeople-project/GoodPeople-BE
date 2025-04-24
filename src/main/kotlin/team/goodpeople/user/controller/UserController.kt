@@ -5,10 +5,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
 import team.goodpeople.global.response.ApiResponse
 import team.goodpeople.security.jwt.annotation.GetUserId
-import team.goodpeople.user.dto.EmailDto
-import team.goodpeople.user.dto.SignUpRequest
-import team.goodpeople.user.dto.UpdateNicknameRequest
-import team.goodpeople.user.dto.UpdatePasswordRequest
+import team.goodpeople.user.dto.*
 import team.goodpeople.user.service.UserService
 
 @RequestMapping("/api/user")
@@ -124,6 +121,29 @@ class UserController(private val userService: UserService) {
                 result = false,
                 status = HttpStatus.BAD_REQUEST.value(),
                 message = "인증 번호 전송에 실패했습니다."
+            )
+        }
+    }
+
+    @PostMapping("/email/code")
+    fun matchEmailAuthenticationCode(
+        @RequestBody @Valid emailAuthDto: EmailAuthDto
+    ): ApiResponse<Boolean> {
+
+        val result = userService.matchEmailAuthenticationCode(emailAuthDto)
+
+        return if (result) {
+            ApiResponse.success(
+                result = true,
+                status = HttpStatus.OK.value(),
+                message = "인증이 완료되었습니다."
+            )
+        }
+        else {
+            ApiResponse.success(
+                result = false,
+                status = HttpStatus.BAD_REQUEST.value(),
+                message = "인증 번호가 일치하지 않습니다."
             )
         }
     }
