@@ -40,4 +40,19 @@ class RedisConfig(
 
         return refreshTemplate
     }
+
+    @Bean
+    fun redisAuthenticationCodeTemplate(): RedisTemplate<String, String> {
+        val authenticationCodeTemplate = RedisTemplate<String, String>()
+
+        authenticationCodeTemplate.apply {
+            connectionFactory = redisConnectionFactory()
+            keySerializer = StringRedisSerializer()
+            valueSerializer = StringRedisSerializer()
+            hashKeySerializer = StringRedisSerializer()
+            hashValueSerializer = StringRedisSerializer()
+        }
+
+        return authenticationCodeTemplate
+    }
 }
