@@ -215,9 +215,8 @@ class UserService(
     private fun generateAuthenticationCode(
         length: Int = 6
     ): String {
-        val authenticationCode = ""
         return (1..length)
             .map { (0..9).random() }
-            .joinToString { authenticationCode }
+            .joinToString("")
     }
 }
