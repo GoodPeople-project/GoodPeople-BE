@@ -17,7 +17,7 @@ import javax.crypto.spec.SecretKeySpec
 
 @Component
 class JWTUtil(
-    @Value("\${jwt.secret}") private val secret: String,
+    @Value("\${spring.jwt.secret}") private val secret: String,
     private val objectMapper: ObjectMapper
 ) {
 
