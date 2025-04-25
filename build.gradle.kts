@@ -59,7 +59,10 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
 
     // Mail
-    implementation ("org.springframework.boot:spring-boot-starter-mail")
+    implementation("org.springframework.boot:spring-boot-starter-mail")
+
+    // Swagger
+    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.5.0")
 }
 
 kotlin {
