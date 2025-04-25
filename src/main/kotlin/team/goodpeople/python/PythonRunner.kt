@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 import java.io.BufferedReader
 import java.io.InputStreamReader
+import java.time.LocalDateTime
 
 @Component
 class PythonRunner(
@@ -21,7 +22,7 @@ class PythonRunner(
     fun runSimilarity(
         pythonScriptRequest: PythonScriptRequest,
     ): String {
-        val startTime = System.currentTimeMillis()
+        val startTime = System.currentTimeMillis() /** 로깅 시작 */
 
         val inputScript = pythonScriptRequest.inputScript
         val scriptPath = similarityModelScript
@@ -37,11 +38,12 @@ class PythonRunner(
         checkTime("2", startTime)
 
         try {
+            /** 파이썬 프로세스 시작 */
             checkTime("3", startTime)
             val process = processBuilder.start()
 
+            /** 파이썬의 stdout 스트림과 연결 */
             checkTime("4", startTime)
-            // ✅ UTF-8로 명시적으로 인코딩 지정
             val reader = BufferedReader(InputStreamReader(process.inputStream, Charsets.UTF_8))
 
             checkTime("5", startTime)
@@ -57,8 +59,8 @@ class PythonRunner(
         }
         checkTime("8", startTime)
 
-        val totalTime = (System.currentTimeMillis() - startTime).toString()
-        log.warn("소요 시간: $totalTime")
+        val totalTime = ((System.currentTimeMillis() - startTime) / 1000.0).toString()
+        log.warn("전체 소요 시간: $totalTime 초")
 
         return result
     }
@@ -68,7 +70,8 @@ class PythonRunner(
         timeStandard: Long
     ) {
         val spent = (System.currentTimeMillis() - timeStandard) / 1000.0
+        val time = LocalDateTime.now().toString()
 
-        log.warn("$tag 소요 시간: $spent 초")
+        log.warn("$tag 소요 시간: $spent 초, $time")
     }
 }
