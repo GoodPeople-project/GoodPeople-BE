@@ -167,7 +167,7 @@ class UserController(private val userService: UserService) {
      * - 중복 이메일이 존재하면 true를 담아 응답
      * - 중복 이메일이 존재하지 않으면 false를 담아 응답
      */
-    @GetMapping("/email")
+    @GetMapping("/email/check")
     fun checkIsEmailDuplicated(
         @RequestBody @Valid emailDto: EmailDto
     ): ApiResponse<Boolean> {
