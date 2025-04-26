@@ -3,9 +3,9 @@ package team.goodpeople.user.entity
 import jakarta.annotation.Nullable
 import jakarta.persistence.*
 import jakarta.validation.constraints.NotNull
-import jakarta.validation.constraints.Pattern
 import jakarta.validation.constraints.Size
 import team.goodpeople.common.BaseEntity
+import team.goodpeople.script.entity.ScriptEntity
 
 /**
  * User Entity
@@ -91,7 +91,10 @@ class User private constructor (
     @field:NotNull
     @field:Enumerated(EnumType.STRING)
     @field:Column(name = "login_type")
-    val loginType: LoginType
+    val loginType: LoginType,
+
+    @field:OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    val scriptEntities: List<ScriptEntity> = emptyList(),
 
 ) : BaseEntity() {
     @field:Nullable

@@ -20,13 +20,12 @@ class PythonRunner(
 
     /** inputScript를 사용자에게 받아 유사 판례 반환 스크립트를 실행한다. */
     fun runSimilarity(
-        pythonScriptRequest: PythonScriptRequest,
+        requestScript: String
     ): String {
         val startTime = System.currentTimeMillis() /** 로깅 시작 */
 
-        val inputScript = pythonScriptRequest.inputScript
         val scriptPath = similarityModelScript
-        val command = listOf(pythonPath, scriptPath, inputScript)
+        val command = listOf(pythonPath, scriptPath, requestScript)
 
         checkTime("1", startTime)
 
