@@ -50,17 +50,34 @@ class ScriptService(
         return responseScript
     }
 
-    fun getAllScript(
+    fun getAllScripts(
         userId: Long,
-    ): List<ScriptResponseDto> {
+    ): List<ScriptResponseDto>? {
 
-        val result = scriptEntityRepository.getScriptEntitiesByUserId(userId)
-            .map { ScriptResponseDto(
-                it.id!!,
-                it.requestScript,
-                it.responseScript,
-                it.requestedAt) }
+        val scriptEntities = scriptEntityRepository.getScriptEntitiesByUserId(userId)
+            ?: return null
 
-        return result
+        return scriptEntities.map { scriptEntity ->
+            ScriptResponseDto(
+                scriptEntity.id!!,
+                scriptEntity.requestScript,
+                scriptEntity.responseScript,
+                scriptEntity.requestedAt
+            )
+        }
+    }
+
+    fun getScript(
+        scriptId: Long,
+    ): ScriptResponseDto {
+
+        val scriptEntity = scriptEntityRepository.getScriptEntityById(scriptId)
+            ?: throw GlobalException(CustomErrorCode.SCRIPT_NOT_EXISTS)
+
+        return ScriptResponseDto(
+            scriptEntity.id!!,
+            scriptEntity.requestScript,
+            scriptEntity.responseScript,
+            scriptEntity.requestedAt)
     }
 }
