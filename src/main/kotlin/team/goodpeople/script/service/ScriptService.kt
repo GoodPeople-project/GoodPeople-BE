@@ -7,6 +7,7 @@ import team.goodpeople.global.exception.CustomErrorCode
 import team.goodpeople.global.exception.GlobalException
 import team.goodpeople.python.PythonRunner
 import team.goodpeople.script.dto.ScriptRequestDto
+import team.goodpeople.script.dto.ScriptResponseDto
 import team.goodpeople.script.entity.ScriptEntity
 import team.goodpeople.script.repository.ScriptEntityRepository
 import team.goodpeople.user.repository.UserRepository
@@ -49,11 +50,17 @@ class ScriptService(
         return responseScript
     }
 
-    fun runSimilarityPython(
-        scriptRequestDto: ScriptRequestDto
-    ) {
+    fun getAllScript(
+        userId: Long,
+    ): List<ScriptResponseDto> {
 
+        val result = scriptEntityRepository.getScriptEntitiesByUserId(userId)
+            .map { ScriptResponseDto(
+                it.id!!,
+                it.requestScript,
+                it.responseScript,
+                it.requestedAt) }
 
-
+        return result
     }
 }

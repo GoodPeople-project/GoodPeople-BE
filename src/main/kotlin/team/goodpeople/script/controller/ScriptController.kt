@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import team.goodpeople.global.response.ApiResponse
 import team.goodpeople.script.dto.ScriptRequestDto
+import team.goodpeople.script.dto.ScriptResponseDto
 import team.goodpeople.script.service.ScriptService
 import team.goodpeople.security.jwt.annotation.GetUserId
 
@@ -27,6 +28,19 @@ class ScriptController(
             result = result,
             status = HttpStatus.OK.value(),
             message = "출력 완료"
+        )
+    }
+
+    @GetMapping("/view/all")
+    fun getAllScript(
+        @GetUserId userId: Long,
+    ): ApiResponse<List<ScriptResponseDto>> {
+        val result = scriptService.getAllScript(userId)
+
+        return ApiResponse.success(
+            result = result,
+            status = HttpStatus.OK.value(),
+            message = "스크립트 가져오기 완료"
         )
     }
 }

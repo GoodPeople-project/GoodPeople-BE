@@ -6,4 +6,6 @@ import team.goodpeople.script.entity.ScriptEntity
 
 @Repository
 interface ScriptEntityRepository : JpaRepository<ScriptEntity, Long> {
+
+    fun getScriptEntitiesByUserId(userId: Long): List<ScriptEntity>
 }
