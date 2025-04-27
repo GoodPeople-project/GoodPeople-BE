@@ -22,6 +22,9 @@ enum class CustomErrorCode(
     USER_ALREADY_DELETED(HttpStatus.BAD_REQUEST, "잘못된 요청입니다."),
     USER_NOT_DELETED(HttpStatus.BAD_REQUEST, "잘못된 요청입니다."),
 
+    /** Script */
+    SCRIPT_NOT_EXISTS(HttpStatus.BAD_REQUEST, "해당 스크립트가 존재하지 않습니다."),
+
 
     /** Security */
     LOGIN_AUTHENTICATION_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "로그인에 실패하였습니다."),
