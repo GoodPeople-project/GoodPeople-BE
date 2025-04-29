@@ -63,6 +63,9 @@ dependencies {
 
     // Swagger
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.5.0")
+
+    // dotenv
+    implementation("io.github.cdimascio:java-dotenv:5.2.2")
 }
 
 kotlin {
