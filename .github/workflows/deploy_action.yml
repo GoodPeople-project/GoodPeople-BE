@@ -3,6 +3,7 @@ name: GoodPeople-BE Deploy to EC2
 on:
   push:
     branches: [ deploy ]
+  workflow_dispatch:
 
 jobs:
   deploy:
