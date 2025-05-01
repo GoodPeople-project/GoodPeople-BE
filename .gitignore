@@ -41,7 +41,7 @@ out/
 /.gitattributes
 /gradle/wrapper/gradle-wrapper.jar
 /gradle/wrapper/gradle-wrapper.properties
-/gradlew
 /gradlew.bat
 /src/test/kotlin/team/goodpeople/GoodpeopleApplicationTests.kt
 /back.env
+/src/main/resources/application-test.yml
