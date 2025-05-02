@@ -60,22 +60,22 @@ jobs:
           source: "build/libs/goodpeople-0.0.1-SNAPSHOT.jar"
           target: "~/deploy"
 
-      - name: Kill existing JAR on EC2
-        uses: appleboy/ssh-action@v0.1.8
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USER }}
-          key: ${{ secrets.EC2_KEY }}
-          script: |
-            echo "Killing existing JAR if running..."
-            if pgrep -f 'goodpeople-0.0.1-SNAPSHOT.jar'; then
-              echo "Found running process, attempting to kill..."
-              pkill -f 'goodpeople-0.0.1-SNAPSHOT.jar' || echo "Kill failed, but continuing..."
-            else
-              echo "No running process found, nothing to kill."
-            fi
-            # Allways Success
-            exit 0
+      # - name: Kill existing JAR on EC2
+      #   uses: appleboy/ssh-action@v0.1.8
+      #   with:
+      #     host: ${{ secrets.EC2_HOST }}
+      #     username: ${{ secrets.EC2_USER }}
+      #     key: ${{ secrets.EC2_KEY }}
+      #     script: |
+      #       echo "Killing existing JAR if running..."
+      #       if pgrep -f 'goodpeople-0.0.1-SNAPSHOT.jar'; then
+      #         echo "Found running process, attempting to kill..."
+      #         pkill -f 'goodpeople-0.0.1-SNAPSHOT.jar' || echo "Kill failed, but continuing..."
+      #       else
+      #         echo "No running process found, nothing to kill."
+      #       fi
+      #       # Allways Success
+      #       exit 0
 
       - name: Run JAR on EC2
         uses: appleboy/ssh-action@v0.1.8
@@ -87,9 +87,20 @@ jobs:
           script_stop: true
           debug: true
           script: |
+            # 프로세스를 먼저 죽이지 않음
+            echo "Checking for existing JAR processes..."
+            PID=$(pgrep -f 'goodpeople-0.0.1-SNAPSHOT.jar' || echo "")
+            if [ ! -z "$PID" ]; then
+              echo "Found process $PID, will terminate after starting new process"
+            else
+              echo "No existing process found"
+            fi
+
+            # 새로운 JAR 실행
             echo "Starting new JAR..."
             cd ~/deploy/build/libs
 
+            # JAR 존재하지 않으면 종료
             if [ ! -f goodpeople-0.0.1-SNAPSHOT.jar ]; then
               echo "JAR Not Exists"
               ls -lh
@@ -105,13 +116,31 @@ jobs:
             # PID Log
             JAVA_PID=$!
             echo "Started Java process with PID: $JAVA_PID"
+
+            # 프로세스 실행 확인
+            sleep 5
+            if ps -p $JAVA_PID > /dev/null; then
+              echo "Process is running successfully"
+              
+              # 이제 기존 프로세스 종료 (새 프로세스가 성공적으로 시작된 후) - pkill 대신 kill 사용
+              if [ ! -z "$PID" ]; then
+                echo "Terminating old process $PID"
+                kill $PID || echo "Failed to kill old process, but continuing"
+              fi
+            else
+              echo "Process failed to start"
+              echo "Log output:"
+              tail -n 20 app.log || echo "No log file found"
+              exit 1
+            fi
             
-            echo "🔍 Running processes:"
+            # 실행 중인 프로세스 확인
+            echo "Running processes:"
             pgrep -fl java || echo "No java process running."
             
-            echo "app.log:"
+            # 로그 출력
+            echo "Recent log output:"
             tail -n 10 app.log || echo "app.log not found"
-            
 
       # Delete GitHub SSH IP
       - name: Revoke GitHub Actions IP from SG
