@@ -50,7 +50,6 @@ jobs:
               --protocol tcp \
               --port 22 \
               --cidr "$CIDR" \
-              --description "GitHub Actions"
           done
 
           echo "EC2 Security Group Updated"
