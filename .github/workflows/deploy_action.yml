@@ -26,6 +26,10 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew clean build -x test
 
+      # Debug
+      - name: check JAR exists
+        run: ls -lh build/libs/
+
       # Process: Add GitHub Action IP to SG
       - name: GitHub Action Runner Public IP
         id: ip
