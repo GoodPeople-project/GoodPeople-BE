@@ -1,6 +1,10 @@
 spring:
   application:
     name: goodpeople
+  ### Web ###
+  web:
+    resources:
+      add-mappings: false
 
   ### DB ###
   # MySQL
