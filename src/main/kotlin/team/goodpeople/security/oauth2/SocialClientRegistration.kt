@@ -27,7 +27,6 @@ class SocialClientRegistration(
 ) {
     private val redirectUri: String = "$DEPLOY_BASE_URL/login/oauth2/code/{registrationId}"
 
-    //  TODO: 헬퍼 클래스 ClientRegistrations 있으나, 사용법 미숙지
     fun naverClientRegistration(): ClientRegistration {
         return ClientRegistration
             .withRegistrationId("naver")
