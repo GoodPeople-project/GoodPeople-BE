@@ -81,7 +81,7 @@ jobs:
           debug: true
           script: |
             echo "Starting new JAR..."
-            cd ~/deploy
+            cd ~/deploy/build/libs
 
             if [ ! -f goodpeople-0.0.1-SNAPSHOT.jar ]; then
               echo "JAR Not Exists"
