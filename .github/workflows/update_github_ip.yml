@@ -66,8 +66,7 @@ jobs:
               --group-id "$SG" \
               --protocol tcp \
               --port 22 \
-              --cidr "$CIDR" \
-              --description "GitHub Actions"
+              --cidr "$CIDR"
 
             COUNT=$((COUNT + 1))
           done
