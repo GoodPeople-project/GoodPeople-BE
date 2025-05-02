@@ -15,11 +15,13 @@ object AuthConstants {
 
     /** - Access Token Constants */
     const val ACCESS_CATEGORY: String = "access"
-    const val ACCESS_EXPIRED_MS: Long = 5 * 60 * 1000L // 5분
+//    const val ACCESS_EXPIRED_MS: Long = 5 * 60 * 1000L // 5분
+    const val ACCESS_EXPIRED_MS: Long = 24 * 60 * 60 * 1000L // 1일
 
     /** - Refresh Token Constants */
     const val REFRESH_CATEGORY: String = "refresh"
-    const val REFRESH_EXPIRED_MS: Long = 60 * 60 * 1000L // 1시간
+//    const val REFRESH_EXPIRED_MS: Long = 60 * 60 * 1000L // 1시간
+    const val REFRESH_EXPIRED_MS: Long = 24 * 60 * 60 * 1000L // 1일
 
 
     /** Cookie Constants */
