@@ -69,8 +69,6 @@ class OAuth2SuccessHandler(
                 response = response,
                 key = "access_token",
                 value = accessToken)
-
-//        response.sendRedirect("/")
             //TODO: 예외처리
         } catch (e: Exception) {
             responseWriter.writeJsonResponse(

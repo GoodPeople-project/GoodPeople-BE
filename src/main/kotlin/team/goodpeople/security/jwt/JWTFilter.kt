@@ -78,6 +78,7 @@ class JWTFilter(
 
             filterChain.doFilter(request, response)
         // TODO: 예외처리 구체화
+        // 검증 실패 시 로그인 페이지로 리다이렉트
         } catch (e: ExpiredJwtException) {
             SecurityContextHolder.clearContext()
             responseWriter.writeJsonResponse(
@@ -88,6 +89,7 @@ class JWTFilter(
                     "Expired Token"
                 )
             )
+            response.sendRedirect("/login")
         } catch (e: JwtException) {
             SecurityContextHolder.clearContext()
             responseWriter.writeJsonResponse(
@@ -98,6 +100,7 @@ class JWTFilter(
                     "Invalid Token"
                 )
             )
+            response.sendRedirect("/login")
         } catch (e: Exception) {
             SecurityContextHolder.clearContext()
             responseWriter.writeJsonResponse(
@@ -108,6 +111,7 @@ class JWTFilter(
                     message = "Error during Token Authentication"
                 )
             )
+            response.sendRedirect("/login")
         }
     }
 
