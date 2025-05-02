@@ -74,6 +74,8 @@ jobs:
             else
               echo "No running process found, nothing to kill."
             fi
+            # Allways Success
+            exit -
 
       - name: Run JAR on EC2
         uses: appleboy/ssh-action@v0.1.8
