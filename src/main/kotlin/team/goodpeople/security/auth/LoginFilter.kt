@@ -114,5 +114,8 @@ class LoginFilter(
                 status = 400,
                 message = "Login failed")
         )
+
+        // 폼 로그인 실패 시 로그인 페이지로 리다이렉트
+        response.sendRedirect("/login")
     }
 }
