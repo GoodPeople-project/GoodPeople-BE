@@ -109,6 +109,12 @@ class RefreshService(
             key = "refresh_token",
             value = newRefreshToken)
 
+        /** Access Token을 쿠키에 담아 응답한다. */
+        sendCookie(
+            response = response,
+            key = "access_token",
+            value = newAccessToken)
+
         return true
     }
 }

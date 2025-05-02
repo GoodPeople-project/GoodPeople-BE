@@ -64,6 +64,12 @@ class OAuth2SuccessHandler(
                 key = "refresh_token",
                 value = refreshToken)
 
+            /** Access Token을 쿠키에 담아 응답한다. */
+            sendCookie(
+                response = response,
+                key = "access_token",
+                value = accessToken)
+
 //        response.sendRedirect("/")
             //TODO: 예외처리
         } catch (e: Exception) {
