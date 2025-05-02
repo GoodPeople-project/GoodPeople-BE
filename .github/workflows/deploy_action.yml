@@ -14,12 +14,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Debug
-        run: |
-          echo "$EC2_KEY" | head -n 5
-        env:
-          EC2_KEY: ${{ secrets.EC2_KEY }}
-
       - name: Set JDK
         uses: actions/setup-java@v3
         with:
@@ -74,6 +68,7 @@ jobs:
             echo "Starting new JAR..."
             cd ~/deploy
             nohup java -jar *.jar > app.log 2>&1 &
+            fail_on_error: false
 
       # Delete GitHub SSH IP
       - name: Revoke GitHub Actions IP from SG
