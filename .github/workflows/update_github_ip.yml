@@ -1,0 +1,56 @@
+name: Update EC2 SG for GitHub Actions IPs
+
+on:
+  workflow_dispatch:  # 수동 실행 버튼
+  schedule:
+    - cron: '0 0 * * 0'  # 매주 일요일 실행
+
+jobs:
+  update-sg:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Install dependencies
+        run: sudo apt-get update && sudo apt-get install -y jq
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Fetch GitHub Actions IP ranges and update SG
+        env:
+          SG_ID: ${{ secrets.SECURITY_GROUP_ID }}
+        run: |
+          echo "🔎 Getting GitHub Actions IPs..."
+          IP_LIST=$(curl -s https://api.github.com/meta | jq -r '.actions[]')
+
+          echo "🧹 Cleaning old GitHub Actions IP rules..."
+          EXISTING=$(aws ec2 describe-security-groups \
+            --group-ids "$SG_ID" \
+            --query "SecurityGroups[0].IpPermissions[?ToPort==\`22\`].IpRanges[?Description==\`GitHub Actions\`].CidrIp" \
+            --output text)
+
+          for CIDR in $EXISTING; do
+            echo "➡️ Removing $CIDR..."
+            aws ec2 revoke-security-group-ingress \
+              --group-id "$SG_ID" \
+              --protocol tcp \
+              --port 22 \
+              --cidr "$CIDR"
+          done
+
+          echo "➕ Adding new GitHub Actions IPs..."
+          for CIDR in $IP_LIST; do
+            echo "➡️ Adding $CIDR..."
+            aws ec2 authorize-security-group-ingress \
+              --group-id "$SG_ID" \
+              --protocol tcp \
+              --port 22 \
+              --cidr "$CIDR" \
+              --description "GitHub Actions"
+          done
+
+          echo "EC2 Security Group Updated"
