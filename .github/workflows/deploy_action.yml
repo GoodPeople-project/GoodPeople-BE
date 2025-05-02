@@ -41,11 +41,12 @@ jobs:
             --group-id ${{ secrets.SECURITY_GROUP_ID }} \
             --protocol tcp \
             --port 22 \
-            --cidr ${{ steps.ip.outputs.ipv4 }}/32 || echo "The IP already exists in the security group"
+            --cidr ${{ steps.ip.outputs.ipv4 }}/32 
+          || echo "The IP already exists in the security group"
       
       # Process: Upload JAR to AWS EC2
       - name: Upload JAR to EC2
-        uses: appleboy/scp-action@master
+        uses: appleboy/scp-action@v0.1.4
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
@@ -54,12 +55,26 @@ jobs:
           target: "~/deploy"
 
       - name: Run JAR on EC2
-        uses: appleboy/ssh-action@master
+        uses: appleboy/ssh-action@v0.1.8
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_KEY }}
           script: |
+            echo "Killing existing JAR if running..."
             pkill -f 'java.*.jar' || true
+            echo "Starting new JAR..."
             cd ~/deploy
             nohup java -jar *.jar > app.log 2>&1 &
+
+      # Delete GitHub SSH IP
+      - name: Revoke GitHub Actions IP from SG
+        if: always()
+        run: |
+          echo "🧼 Revoking IP ${{ steps.ip.outputs.ipv4 }}/32 from security group"
+          aws ec2 revoke-security-group-ingress \
+            --group-id ${{ secrets.SECURITY_GROUP_ID }} \
+            --protocol tcp \
+            --port 22 \
+            --cidr ${{ steps.ip.outputs.ipv4 }}/32 \
+          || echo "IP not found, nothing to revoke"
