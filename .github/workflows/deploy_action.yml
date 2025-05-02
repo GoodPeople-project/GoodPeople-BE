@@ -41,8 +41,7 @@ jobs:
             --group-id ${{ secrets.SECURITY_GROUP_ID }} \
             --protocol tcp \
             --port 22 \
-            --cidr ${{ steps.ip.outputs.ipv4 }}/32 
-          || echo "The IP already exists in the security group"
+            --cidr ${{ steps.ip.outputs.ipv4 }}/32 || echo "The IP already exists in the security group"
       
       # Process: Upload JAR to AWS EC2
       - name: Upload JAR to EC2
@@ -76,5 +75,4 @@ jobs:
             --group-id ${{ secrets.SECURITY_GROUP_ID }} \
             --protocol tcp \
             --port 22 \
-            --cidr ${{ steps.ip.outputs.ipv4 }}/32 \
-          || echo "IP not found, nothing to revoke"
+            --cidr ${{ steps.ip.outputs.ipv4 }}/32 || echo "IP not found, nothing to revoke"
