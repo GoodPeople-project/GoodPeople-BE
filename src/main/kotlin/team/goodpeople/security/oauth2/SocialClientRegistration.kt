@@ -5,7 +5,7 @@ import org.springframework.security.oauth2.client.registration.ClientRegistratio
 import org.springframework.security.oauth2.core.AuthorizationGrantType
 import org.springframework.security.oauth2.core.oidc.IdTokenClaimNames
 import org.springframework.stereotype.Component
-import team.goodpeople.security.AuthConstants.DEVELOP_BASE_URL
+import team.goodpeople.security.AuthConstants.DEPLOY_BASE_URL
 
 @Component
 class SocialClientRegistration(
@@ -25,7 +25,7 @@ class SocialClientRegistration(
     @Value("\${spring.security.oauth2.client.registration.google.client-secret}")
     val googleClientSecret: String,
 ) {
-    private val redirectUri: String = "$DEVELOP_BASE_URL/login/oauth2/code/{registrationId}"
+    private val redirectUri: String = "$DEPLOY_BASE_URL/login/oauth2/code/{registrationId}"
 
     //  TODO: 헬퍼 클래스 ClientRegistrations 있으나, 사용법 미숙지
     fun naverClientRegistration(): ClientRegistration {
