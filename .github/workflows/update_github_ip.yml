@@ -1,9 +1,7 @@
-name: Update EC2 SG for GitHub Actions IPs
+name: Update EC2 SG for GitHub Actions IPs (Split Across 3 SGs)
 
 on:
-  workflow_dispatch:  # 수동 실행 버튼
-  schedule:
-    - cron: '0 0 * * 0'  # 매주 일요일 실행
+  workflow_dispatch:
 
 jobs:
   update-sg:
@@ -11,16 +9,14 @@ jobs:
 
     steps:
       - name: Install dependencies
-        run: sudo apt-get update && sudo apt-get install -y jq
+        run: sudo apt-get update && sudo apt-get install -y jq unzip curl
 
-      - name: Upgrade AWS CLI to v2
+      - name: Upgrade AWS CLI
         run: |
           curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
           unzip awscliv2.zip
           sudo ./aws/install --update
           sudo ln -sf /usr/local/bin/aws /usr/bin/aws
-          echo "✅ AWS CLI version:"
-          aws --version
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v2
@@ -29,36 +25,50 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
 
-      - name: Fetch GitHub Actions IP ranges and update SG
+      - name: Update 3 security groups with GitHub Actions IPs
         env:
-          SG_ID: ${{ secrets.SECURITY_GROUP_ID }}
+          SG_1: ${{ secrets.SG_ID_1 }}
+          SG_2: ${{ secrets.SG_ID_2 }}
+          SG_3: ${{ secrets.SG_ID_3 }}
         run: |
-          echo "🔎 Getting GitHub Actions IPs..."
-          IP_LIST=$(curl -s https://api.github.com/meta | jq -r '.actions[]')
+          echo "📦 Fetching GitHub Actions IPs..."
+          IP_LIST=($(curl -s https://api.github.com/meta | jq -r '.actions[]'))
 
-          echo "🧹 Cleaning old GitHub Actions IP rules..."
-          EXISTING=$(aws ec2 describe-security-groups \
-            --group-ids "$SG_ID" \
-            --query "SecurityGroups[0].IpPermissions[?ToPort==\`22\`].IpRanges[?Description==\`GitHub Actions\`].CidrIp" \
-            --output text)
+          echo "🧹 Revoking old rules from all SGs..."
+          for SG in $SG_1 $SG_2 $SG_3; do
+            EXISTING=$(/usr/local/bin/aws ec2 describe-security-groups \
+              --group-ids "$SG" \
+              --query "SecurityGroups[0].IpPermissions[?ToPort==\`22\`].IpRanges[?Description==\`GitHub Actions\`].CidrIp" \
+              --output text)
+            for CIDR in $EXISTING; do
+              echo "➡️ Revoking $CIDR from $SG..."
+              /usr/local/bin/aws ec2 revoke-security-group-ingress \
+                --group-id "$SG" \
+                --protocol tcp \
+                --port 22 \
+                --cidr "$CIDR"
+            done
+          done
 
-          for CIDR in $EXISTING; do
-            echo "➡️ Removing $CIDR..."
-            aws ec2 revoke-security-group-ingress \
-              --group-id "$SG_ID" \
+          echo "➕ Distributing new IPs across 3 SGs..."
+          COUNT=0
+          for CIDR in "${IP_LIST[@]}"; do
+            if (( COUNT < 60 )); then
+              SG=$SG_1
+            elif (( COUNT < 120 )); then
+              SG=$SG_2
+            else
+              SG=$SG_3
+            fi
+
+            echo "➡️ Adding $CIDR to $SG..."
+            /usr/local/bin/aws ec2 authorize-security-group-ingress \
+              --group-id "$SG" \
               --protocol tcp \
               --port 22 \
               --cidr "$CIDR"
+
+            COUNT=$((COUNT + 1))
           done
 
-          echo "➕ Adding new GitHub Actions IPs..."
-          for CIDR in $IP_LIST; do
-            echo "➡️ Adding $CIDR..."
-            aws ec2 authorize-security-group-ingress \
-              --group-id "$SG_ID" \
-              --protocol tcp \
-              --port 22 \
-              --cidr "$CIDR" \
-          done
-
-          echo "EC2 Security Group Updated"
+          echo "✅ All GitHub Actions IPs distributed across 3 security groups."
