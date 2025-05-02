@@ -58,7 +58,7 @@ jobs:
               --group-id "$SG_ID" \
               --protocol tcp \
               --port 22 \
-              --cidr "$CIDR" \
+              --cidr "$CIDR"
           done
 
           echo "EC2 Security Group Updated"
