@@ -31,7 +31,7 @@ object AuthConstants {
     const val COOKIE_MAX_AGE: Int = 24 * 60 * 60 * 1000 // 1일
 
     const val COOKIE_HTTP_ONLY: Boolean = true
-    const val COOKIE_SET_SECURE: Boolean = true
+    const val COOKIE_SET_SECURE: Boolean = false
 
 
     /** Authentication Code Constants */
