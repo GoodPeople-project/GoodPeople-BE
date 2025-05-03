@@ -111,11 +111,8 @@ class LoginFilter(
             status = 401,
             body = ApiResponse.failure<String>(
                 // TODO: CustomErrorCode와 연계가 될 것 같다.
-                status = 400,
+                status = 401,
                 message = "Login failed")
         )
-
-        // 폼 로그인 실패 시 로그인 페이지로 리다이렉트
-        response.sendRedirect("/login")
     }
 }
