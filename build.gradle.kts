@@ -66,6 +66,9 @@ dependencies {
 
     // dotenv
     implementation("io.github.cdimascio:java-dotenv:5.2.2")
+
+    // WebFlux
+    implementation("org.springframework.boot:spring-boot-starter-webflux")
 }
 
 kotlin {
