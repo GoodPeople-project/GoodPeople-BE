@@ -89,7 +89,6 @@ class JWTFilter(
                     "Expired Token"
                 )
             )
-            response.sendRedirect("/login")
         } catch (e: JwtException) {
             SecurityContextHolder.clearContext()
             responseWriter.writeJsonResponse(
@@ -100,7 +99,6 @@ class JWTFilter(
                     "Invalid Token"
                 )
             )
-            response.sendRedirect("/login")
         } catch (e: Exception) {
             SecurityContextHolder.clearContext()
             responseWriter.writeJsonResponse(
@@ -111,7 +109,6 @@ class JWTFilter(
                     message = "Error during Token Authentication"
                 )
             )
-            response.sendRedirect("/login")
         }
     }
 
