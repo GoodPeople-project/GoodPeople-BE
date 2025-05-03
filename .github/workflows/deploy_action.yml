@@ -150,7 +150,7 @@ jobs:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_KEY }}
-          source: "fastapi/*"
+          source: "fastapi"
           target: "~"
 
       # FastAPI 서버 실행
