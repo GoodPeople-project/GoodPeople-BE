@@ -1,11 +1,9 @@
 package team.goodpeople.script.service
 
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import team.goodpeople.global.exception.CustomErrorCode
 import team.goodpeople.global.exception.GlobalException
-import team.goodpeople.python.PythonRunner
+import team.goodpeople.script.FastApiClient
 import team.goodpeople.script.dto.ScriptRequestDto
 import team.goodpeople.script.dto.ScriptResponseDto
 import team.goodpeople.script.entity.ScriptEntity
@@ -16,14 +14,13 @@ import java.time.LocalDateTime
 @Service
 class ScriptService(
     private val userRepository: UserRepository,
-    private val pythonRunner: PythonRunner,
     private val scriptEntityRepository: ScriptEntityRepository,
+    private val fastApiClient: FastApiClient
 ) {
-    private val logger: Logger = LoggerFactory.getLogger(ScriptService::class.java)
 
     fun saveAndReturnSimilarity(
         userId: Long,
-        scriptRequestDto: ScriptRequestDto
+        scriptRequestDto: ScriptRequestDto,
     ): String {
         /** 유저 유효성 확인 */
         val user = userRepository.findById(userId)
@@ -32,22 +29,23 @@ class ScriptService(
         val requestScript = scriptRequestDto.script
         val requestedAt = LocalDateTime.now()
 
-        /** 사용자 스크립트를 파이썬 프로세스로 전달 */
-        // TODO: 일단 결과 반환하고 저장 등등 가능?
-        val responseScript = pythonRunner.runSimilarity(requestScript)
+        /** FastAPI 서버에 스크립트 요청 */
+        val result = fastApiClient.analyzeSimilarCase(requestScript)
+            .top3.joinToString("\n\n") { case ->
+                "Top 사례:\n${case.story}\n\n판별 결과: ${case.result}"
+            }
 
-        /** 내용 저장 */
+        /** DB에 내용 저장 */
         val scriptEntity = ScriptEntity(
             requestScript = requestScript,
-            responseScript = responseScript,
+            responseScript = result,
             requestedAt = requestedAt,
             user = user
         )
-
         scriptEntityRepository.save(scriptEntity)
 
-        /** 결과 전달 */
-        return responseScript
+        /** 결과 반환 */
+        return result
     }
 
     fun getAllScripts(
