@@ -9,7 +9,7 @@ from typing import List
 app = FastAPI()
 
 # 서버 부팅 시 미리 캐싱한 CSV 파일, 모델 로드
-with open("cache/law_cache.pkl", "rb") as f:
+with open("../cache/law_cache.pkl", "rb") as f:
     df, x = pickle.load(f)
 model = SentenceTransformer('distiluse-base-multilingual-cased-v2')
 
