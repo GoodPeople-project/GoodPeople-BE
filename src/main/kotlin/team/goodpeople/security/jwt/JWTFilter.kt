@@ -13,6 +13,7 @@ import team.goodpeople.global.response.ResponseWriter
 import team.goodpeople.security.AuthConstants.MASKED_PASSWORD
 import team.goodpeople.security.auth.CustomUserDetails
 import team.goodpeople.security.jwt.dto.UserInfoDto
+import team.goodpeople.security.oauth2.dto.CustomOAuth2User
 import team.goodpeople.security.path.SecurityPath.AUTH_WHITELIST
 import team.goodpeople.security.path.SecurityPath.isWhitelistedURI
 
@@ -21,6 +22,7 @@ class JWTFilter(
     private val responseWriter: ResponseWriter
 ) : OncePerRequestFilter() {
 
+    /** JWT 검증이 필요 없는 API에 대해서는 필터가 작동하지 않는다. */
     override fun shouldNotFilter(
         request: HttpServletRequest
     ): Boolean {
@@ -49,25 +51,26 @@ class JWTFilter(
 
             /**
              * 검증 후 Context에 사용자 등록
-             * 팩토리 메서드로 user 객체를 생성하여 Details에 넘긴다.
+             * 로그인 타입에 따라 분기, Context에 저장된다.
              * */
-            /*TODO: OAuth2 이식하기
-            *  현재 UserDetails를 상속한 CustomUserDetails에 정보를 담은 후,
-            *  ContextHolder에 저장하고 있음.
-            *  로그인 방식이 두 가지임을 고려하여 공통 DTO를 작성할지,
-            *  로그인 방식에 따라 DTO를 다르게 할지 고려 필요
-            *  근데 여기서 역직렬화를 굳이 하는 이유가 있냐?
-            * */
             val userInfo = jwtUtil.getNestedClaim(accessToken, "user", UserInfoDto::class.java)
 
-            // TODO: OAuth2일 경우, OAuth2User로 저장하도록 분기
-            val userDetails = CustomUserDetails(
-                username = userInfo.username,
-                password = MASKED_PASSWORD,
-                userId = userInfo.userId,
-                role = userInfo.role,
-                loginType = userInfo.loginType
-            )
+            val userDetails =
+                if (userInfo.loginType == "FORM") {
+                    CustomUserDetails(
+                        username = userInfo.username,
+                        password = MASKED_PASSWORD,
+                        userId = userInfo.userId,
+                        role = userInfo.role,
+                        loginType = userInfo.loginType) }
+                else {
+                    CustomOAuth2User(
+                        username = userInfo.username,
+                        userId = userInfo.userId,
+                        role = userInfo.role,
+                        loginType = userInfo.loginType,
+                        attributes = emptyMap())
+                }
 
             val authenticationToken = UsernamePasswordAuthenticationToken(userDetails, null)
 
@@ -77,7 +80,6 @@ class JWTFilter(
             request.setAttribute("user", userInfo)
 
             filterChain.doFilter(request, response)
-        // TODO: 예외처리 구체화
         // 검증 실패 시 로그인 페이지로 리다이렉트
         } catch (e: ExpiredJwtException) {
             SecurityContextHolder.clearContext()
