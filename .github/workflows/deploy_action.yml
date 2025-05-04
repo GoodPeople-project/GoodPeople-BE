@@ -121,8 +121,8 @@ jobs:
             echo "Recent log output:"
             tail -n 10 app.log || echo "app.log not found"
 
-      # FastAPI 서버 실행
-      - name: Run FastAPI server on EC2
+      # 실행 중인 FastAPI 서버 종료
+      - name: Kill existing FastAPI server on EC2
         uses: appleboy/ssh-action@v0.1.8
         continue-on-error: true
         with:
@@ -132,7 +132,15 @@ jobs:
           script: |
             echo "Killing existing FastAPI..."
             pkill -f "uvicorn" || true
-
+      
+      # FastAPI 서버 실행
+      - name: Run FastAPI server on EC2
+        uses: appleboy/ssh-action@v0.1.8
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_KEY }}
+          script: |
             # Bash 로그인 쉘에서 직접 실행
             echo "Activating env and restarting FastAPI..."
             bash -lc 'cd ~/fastapi && nohup ~/myenv/bin/uvicorn app:app --host 0.0.0.0 --port 8000 > ~/fastapi/fastapi.log 2>&1 &'
