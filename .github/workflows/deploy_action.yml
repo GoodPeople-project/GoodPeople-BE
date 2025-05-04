@@ -155,7 +155,7 @@ jobs:
             # Bash 로그인 쉘에서 직접 실행
             echo "Activating env and restarting FastAPI..."
             bash -lc 'cd ~/fastapi && nohup ~/myenv/bin/uvicorn app:app --host 0.0.0.0 --port 8000 
-            > ~/fastapi/fastapi.log 2>&1 & < /dev/null &'
+            > ~/fastapi/fastapi.log 2>&1 < /dev/null &'
 
             # Debug: timeout 문제 해결. 위의 /dev/null & 포함
             exit 0
