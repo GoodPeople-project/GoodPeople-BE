@@ -142,7 +142,7 @@ jobs:
           key: ${{ secrets.EC2_KEY }}
           script: |
             echo "Preparing cache..."
-            bash -lc 'cd ~/fastapi && source ~/myenv/bin/active python3.8 prepare_law_cache.py'
+            bash -lc 'cd ~/fastapi && source ~/myenv/bin/activate python3.8 prepare_law_cache.py'
       
       # FastAPI 서버 실행
       - name: Run FastAPI server on EC2
