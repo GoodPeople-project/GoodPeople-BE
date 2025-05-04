@@ -124,7 +124,7 @@ jobs:
       # FastAPI 서버 실행
       - name: Run FastAPI server on EC2
         uses: appleboy/ssh-action@v0.1.8
-        continue-on-error: true
+        # continue-on-error: true
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
