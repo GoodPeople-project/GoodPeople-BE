@@ -2,6 +2,7 @@ package team.goodpeople.global.exception
 
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.web.HttpRequestMethodNotSupportedException
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
 import org.springframework.web.servlet.NoHandlerFoundException
@@ -30,6 +31,17 @@ class GlobalExceptionHandler {
             .body(ApiResponse.failure(
                 status = HttpStatus.NOT_FOUND.value(),
                 message = "No Resources Found"))
+    }
+
+    /* 잘못된 Http 메서드 요청 시 405 응답 */
+    @ExceptionHandler(HttpRequestMethodNotSupportedException::class)
+    fun httpMethodNotSupportedException(e: HttpRequestMethodNotSupportedException): ResponseEntity<ApiResponse<Nothing>> {
+        return ResponseEntity
+            .status(HttpStatus.METHOD_NOT_ALLOWED)
+            .body(ApiResponse.failure(
+                status = HttpStatus.METHOD_NOT_ALLOWED.value(),
+                message = "Method Not Allowed"
+            ))
     }
 
     /* 그 외 예외 응답 */
