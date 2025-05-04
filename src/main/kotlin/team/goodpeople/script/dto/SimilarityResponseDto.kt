@@ -8,6 +8,35 @@ package team.goodpeople.script.dto
  *  { "story": "유사 사례3", "result": "인정"}
  * ]
  * */
+
+data class SimilarMainCase(
+    val case: String,
+    val caseNo: String,
+    val score: Double,
+    val judgementResult: String,
+    val judgementReason: String
+)
+
+data class SimilarOtherCase(
+    val case: String,
+    val caseNo: String,
+    val score: Double,
+    val judgementResult: String
+)
+
+data class SimilarityResponseDto(
+    val myCase: String,
+    val mainCase: SimilarMainCase,
+    val keyword: String,
+    val aiPredict: String,
+    val otherCases: List<SimilarOtherCase>
+)
+
+//data class SimilarityResponseDto(
+//    val top3: SimilarityResult
+//)
+
+/* 기존 코드
 data class SimilarityResponseDto(
     val top3: List<SimilarityCaseDto> = listOf(),
 )
@@ -16,3 +45,4 @@ data class SimilarityCaseDto(
     val story: String,
     val result: String
 )
+*/

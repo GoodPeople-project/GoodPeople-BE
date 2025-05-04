@@ -4,6 +4,6 @@ import jakarta.validation.constraints.NotNull
 
 data class ScriptRequestDto(
     @NotNull
-    val script: String = "",
+    val content: String = "",
 ) {
 }
