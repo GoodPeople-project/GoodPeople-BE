@@ -14,7 +14,7 @@ class ScriptController(
     private val scriptService: ScriptService
 ) {
 
-    @GetMapping("/similarity")
+    @PostMapping("/similarity")
     fun requestSimilarityScript(
         @GetUserId userId: Long,
         @RequestBody scriptRequestDto: ScriptRequestDto
