@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.*
 import team.goodpeople.global.response.ApiResponse
 import team.goodpeople.script.dto.ScriptRequestDto
 import team.goodpeople.script.dto.ScriptResponseDto
+import team.goodpeople.script.dto.SimilarityResponseDto
 import team.goodpeople.script.service.ScriptService
 import team.goodpeople.security.jwt.annotation.GetUserId
 
@@ -18,7 +19,7 @@ class ScriptController(
     fun requestSimilarityScript(
         @GetUserId userId: Long,
         @RequestBody scriptRequestDto: ScriptRequestDto
-    ): ApiResponse<String> {
+    ): ApiResponse<SimilarityResponseDto> {
         val result = scriptService.saveAndReturnSimilarity(userId, scriptRequestDto)
 
         return ApiResponse.success(
