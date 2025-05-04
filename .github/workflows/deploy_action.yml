@@ -9,7 +9,6 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
 
-    # Process: Build
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -26,11 +25,7 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew clean build -x test
 
-      # Debug
-      - name: check JAR exists
-        run: ls -lh build/libs/
-
-      # Process: Add GitHub Action IP to SG
+      # SSH 연결 위해 Security Group에 깃허브 액션 Public IP 추가
       - name: GitHub Action Runner Public IP
         id: ip
         uses: haythem/public-ip@v1.3
@@ -50,7 +45,7 @@ jobs:
             --port 22 \
             --cidr ${{ steps.ip.outputs.ipv4 }}/32 || echo "The IP already exists in the security group"
       
-      # Process: Upload JAR to AWS EC2
+      # JAR 업로드
       - name: Upload JAR to EC2
         uses: appleboy/scp-action@v0.1.4
         with:
@@ -59,90 +54,7 @@ jobs:
           key: ${{ secrets.EC2_KEY }}
           source: "build/libs/goodpeople-0.0.1-SNAPSHOT.jar"
           target: "~/deploy"
-
-      # - name: Kill existing JAR on EC2
-      #   uses: appleboy/ssh-action@v0.1.8
-      #   with:
-      #     host: ${{ secrets.EC2_HOST }}
-      #     username: ${{ secrets.EC2_USER }}
-      #     key: ${{ secrets.EC2_KEY }}
-      #     script: |
-      #       echo "Killing existing JAR if running..."
-      #       if pgrep -f 'goodpeople-0.0.1-SNAPSHOT.jar'; then
-      #         echo "Found running process, attempting to kill..."
-      #         pkill -f 'goodpeople-0.0.1-SNAPSHOT.jar' || echo "Kill failed, but continuing..."
-      #       else
-      #         echo "No running process found, nothing to kill."
-      #       fi
-      #       # Allways Success
-      #       exit 0
-
-      - name: Run JAR on EC2
-        uses: appleboy/ssh-action@v0.1.8
-        continue-on-error: true
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USER }}
-          key: ${{ secrets.EC2_KEY }}
-          command_timeout: "10m"
-          script_stop: true
-          debug: true
-          script: |
-            # 프로세스를 먼저 죽이지 않음
-            echo "Checking for existing JAR processes..."
-            PID=$(pgrep -f 'goodpeople-0.0.1-SNAPSHOT.jar' || echo "")
-            if [ ! -z "$PID" ]; then
-              echo "Found process $PID, will terminate after starting new process"
-            else
-              echo "No existing process found"
-            fi
-
-            # 새로운 JAR 실행
-            echo "Starting new JAR..."
-            cd ~/deploy/build/libs
-
-            # JAR 존재하지 않으면 종료
-            if [ ! -f goodpeople-0.0.1-SNAPSHOT.jar ]; then
-              echo "JAR Not Exists"
-              ls -lh
-              exit 1
-            fi
-
-            # Permission
-            chmod +x goodpeople-0.0.1-SNAPSHOT.jar
-
-            # Run
-            nohup java -jar goodpeople-0.0.1-SNAPSHOT.jar > app.log 2>&1 &
-
-            # PID Log
-            JAVA_PID=$!
-            echo "Started Java process with PID: $JAVA_PID"
-
-            # 프로세스 실행 확인
-            sleep 5
-            if ps -p $JAVA_PID > /dev/null; then
-              echo "Process is running successfully"
-              
-              # 이제 기존 프로세스 종료 (새 프로세스가 성공적으로 시작된 후) - pkill 대신 kill 사용
-              if [ ! -z "$PID" ]; then
-                echo "Terminating old process $PID"
-                kill $PID || echo "Failed to kill old process, but continuing"
-              fi
-            else
-              echo "Process failed to start"
-              echo "Log output:"
-              tail -n 20 app.log || echo "No log file found"
-              exit 1
-            fi
-            
-            # 실행 중인 프로세스 확인
-            echo "Running processes:"
-            pgrep -fl java || echo "No java process running."
-            
-            # 로그 출력
-            echo "Recent log output:"
-            tail -n 10 app.log || echo "app.log not found"
-
+      
       # FastAPI 업로드
       - name: Upload FastAPI server to EC2
         uses: appleboy/scp-action@v0.1.4
@@ -152,6 +64,62 @@ jobs:
           key: ${{ secrets.EC2_KEY }}
           source: "fastapi"
           target: "~"
+
+      # 실행 중인 JAR 종료
+      # continue-on-error 옵션으로 강제 성공 처리
+      - name: Kill existing JAR on EC2
+        uses: appleboy/ssh-action@v0.1.8
+        continue-on-error: true
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_KEY }}
+          script: |
+            echo "Killing existing JAR if running..."
+            if pgrep -f 'goodpeople-0.0.1-SNAPSHOT.jar'; then
+              echo "Found running process, attempting to kill..."
+              pkill -f 'goodpeople-0.0.1-SNAPSHOT.jar' || echo "Kill failed, but continuing..."
+            else
+              echo "No running process found, nothing to kill."
+            fi
+
+      # 업로드 한 JAR 실행
+      - name: Run JAR on EC2
+        uses: appleboy/ssh-action@v0.1.8
+        # continue-on-error: true
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_KEY }}
+          # command_timeout: "10m"
+          script: |
+            echo "Starting new JAR..."
+
+            # JAR 존재하지 않으면 종료
+            cd ~/deploy/build/libs
+            if [ ! -f goodpeople-0.0.1-SNAPSHOT.jar ]; then
+              echo "JAR Not Exists"
+              ls -lh
+              exit 1
+            fi
+
+            # 권한 부여
+            chmod +x goodpeople-0.0.1-SNAPSHOT.jar
+
+            # 실행
+            nohup java -jar goodpeople-0.0.1-SNAPSHOT.jar > app.log 2>&1 &
+
+            # PID Log
+            JAVA_PID=$!
+            echo "Started Java process with PID: $JAVA_PID"
+            
+            # 실행 중인 프로세스 확인
+            echo "Running processes:"
+            pgrep -fl java || echo "No java process running."
+            
+            # 로그 출력
+            echo "Recent log output:"
+            tail -n 10 app.log || echo "app.log not found"
 
       # FastAPI 서버 실행
       - name: Run FastAPI server on EC2
@@ -165,7 +133,7 @@ jobs:
             echo "Killing existing FastAPI..."
             pkill -f "uvicorn" || true
 
-            echo "Activating conda and restarting FastAPI..."
+            echo "Activating env and restarting FastAPI..."
             source ~/myenv/bin/activate
             cd ~/fastapi
             nohup uvicorn app:app --host 0.0.0.0 --port 8000 > fastapi.log 2>&1 &
