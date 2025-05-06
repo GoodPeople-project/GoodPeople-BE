@@ -55,9 +55,6 @@ spring:
       mail.smtp.starttls.enable: true
 
   ### Python ###
-  python:
-    path: ${PYTHON_PATH}
-    script_path: ${PYTHON_SCRIPT_PATH}
   external:
     fastapi:
       url: ${FASTAPI_PATH}
