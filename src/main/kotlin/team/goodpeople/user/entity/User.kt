@@ -5,7 +5,6 @@ import jakarta.persistence.*
 import jakarta.validation.constraints.NotNull
 import jakarta.validation.constraints.Size
 import team.goodpeople.common.BaseEntity
-import team.goodpeople.script.entity.ScriptEntity
 import team.goodpeople.script.entity.UserScript
 
 /**
@@ -96,9 +95,6 @@ class User private constructor (
 
     @field:OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     val userScripts: List<UserScript> = emptyList(),
-
-//    @field:OneToMany(mappedBy = "user", fetch = FetchType.LAZY, orphanRemoval = true)
-//    val additionalInfos: List<AdditionalInfo> = emptyList(),
 
     ) : BaseEntity() {
     @field:Nullable
