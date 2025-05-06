@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotNull
 import jakarta.validation.constraints.Size
 import team.goodpeople.common.BaseEntity
 import team.goodpeople.script.entity.ScriptEntity
+import team.goodpeople.script.entity.UserScript
 
 /**
  * User Entity
@@ -94,24 +95,17 @@ class User private constructor (
     val loginType: LoginType,
 
     @field:OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
-    val scriptEntities: List<ScriptEntity> = emptyList(),
+    val userScripts: List<UserScript> = emptyList(),
 
-) : BaseEntity() {
+//    @field:OneToMany(mappedBy = "user", fetch = FetchType.LAZY, orphanRemoval = true)
+//    val additionalInfos: List<AdditionalInfo> = emptyList(),
+
+    ) : BaseEntity() {
     @field:Nullable
     @field:Size(min = 8)
     @field:Column(name = "password")
     var password = password
         private set
-
-    /** 기본 생성자 */
-    protected constructor() : this(
-        id = null,
-        username = "",
-        password = "",
-        nickname = "",
-        email = "",
-        loginType = LoginType.FORM
-    )
 
     companion object {
         /** 폼 회원가입 팩토리 메서드 */
@@ -144,4 +138,15 @@ class User private constructor (
     fun updatePassword(password: String) {
         this.password = password
     }
+
+
+    /** 필수 보조 생성자 */
+    protected constructor() : this(
+        id = null,
+        username = "",
+        password = "",
+        nickname = "",
+        email = "",
+        loginType = LoginType.FORM
+    )
 }

@@ -5,16 +5,18 @@ import team.goodpeople.global.exception.CustomErrorCode
 import team.goodpeople.global.exception.GlobalException
 import team.goodpeople.script.FastApiClient
 import team.goodpeople.script.dto.ScriptRequestDto
-import team.goodpeople.script.dto.ScriptResponseDto
+import team.goodpeople.script.dto.UserScriptDto
 import team.goodpeople.script.dto.SimilarityResponseDto
-import team.goodpeople.script.repository.ScriptEntityRepository
+import team.goodpeople.script.entity.UserScript.Companion.createUserScriptWithNecessary
+import team.goodpeople.script.repository.SimilarityAnalysisRepository
+import team.goodpeople.script.repository.UserScriptRepository
 import team.goodpeople.user.repository.UserRepository
-import java.time.LocalDateTime
 
 @Service
 class ScriptService(
     private val userRepository: UserRepository,
-    private val scriptEntityRepository: ScriptEntityRepository,
+    private val userScriptRepository: UserScriptRepository,
+    private val similarityAnalysisRepository: SimilarityAnalysisRepository,
     private val fastApiClient: FastApiClient
 ) {
 
@@ -26,19 +28,20 @@ class ScriptService(
         val user = userRepository.findById(userId)
             .orElseThrow { throw GlobalException(CustomErrorCode.USER_NOT_EXISTS) }
 
-        val requestScript = scriptRequestDto.content
-        val requestedAt = LocalDateTime.now()
+        val content = scriptRequestDto.content
 
         /** FastAPI 서버에 스크립트 요청 */
-//        val result = fastApiClient.analyzeSimilarCase(requestScript)
-//            .top3.joinToString("\n\n") { case ->
-//                "Top 사례:\n${case.story}\n\n판별 결과: ${case.result}"
-//            }
+        val result = fastApiClient.analyzeSimilarCase(content)
 
-        val result = fastApiClient.analyzeSimilarCase(requestScript)
+        /** DB에 사용자 요청 스크립트 저장 */
+        userScriptRepository.save(
+            createUserScriptWithNecessary(
+                content = content,
+                user = user)
+        )
 
-        /** DB에 내용 저장 */
-//        TODO: 새로운 스키마에 맞춰 수정하기
+        /** DB에 AI 응답 저장 */
+        // TODO: 새로운 스키마에 맞춰 수정하기
 //        val scriptEntity = ScriptEntity(
 //            requestScript = requestScript,
 //            responseScript = result,
@@ -51,34 +54,32 @@ class ScriptService(
         return result
     }
 
-    fun getAllScripts(
+    fun getAllUserScripts(
         userId: Long,
-    ): List<ScriptResponseDto>? {
+    ): List<UserScriptDto>? {
 
-        val scriptEntities = scriptEntityRepository.getScriptEntitiesByUserId(userId)
+        val userScripts = userScriptRepository.getUserScriptsByUserId(userId)
             ?: return null
 
-        return scriptEntities.map { scriptEntity ->
-            ScriptResponseDto(
-                scriptEntity.id!!,
-                scriptEntity.requestScript,
-                scriptEntity.responseScript,
-                scriptEntity.requestedAt
+        return userScripts.map { userScript ->
+            UserScriptDto(
+                userScript.id!!,
+                userScript.content,
+                userScript.requestedAt
             )
         }
     }
 
-    fun getScript(
+    fun getUserScript(
         scriptId: Long,
-    ): ScriptResponseDto {
+    ): UserScriptDto {
 
-        val scriptEntity = scriptEntityRepository.getScriptEntityById(scriptId)
+        val userScript = userScriptRepository.getUserScriptByUserId(scriptId)
             ?: throw GlobalException(CustomErrorCode.SCRIPT_NOT_EXISTS)
 
-        return ScriptResponseDto(
-            scriptEntity.id!!,
-            scriptEntity.requestScript,
-            scriptEntity.responseScript,
-            scriptEntity.requestedAt)
+        return UserScriptDto(
+            userScript.id!!,
+            userScript.content,
+            userScript.requestedAt)
     }
 }

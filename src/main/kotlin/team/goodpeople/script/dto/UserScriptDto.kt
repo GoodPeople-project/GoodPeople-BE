@@ -2,10 +2,9 @@ package team.goodpeople.script.dto
 
 import java.time.LocalDateTime
 
-data class ScriptResponseDto (
+data class UserScriptDto (
     val scriptId: Long,
-    val requestScript: String,
-    val responseScript: String,
+    val content: String,
     val requestedAt: LocalDateTime,
 ){
 }

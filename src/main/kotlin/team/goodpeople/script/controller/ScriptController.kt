@@ -4,7 +4,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
 import team.goodpeople.global.response.ApiResponse
 import team.goodpeople.script.dto.ScriptRequestDto
-import team.goodpeople.script.dto.ScriptResponseDto
+import team.goodpeople.script.dto.UserScriptDto
 import team.goodpeople.script.dto.SimilarityResponseDto
 import team.goodpeople.script.service.ScriptService
 import team.goodpeople.security.jwt.annotation.GetUserId
@@ -30,10 +30,10 @@ class ScriptController(
     }
 
     @GetMapping("/view/all")
-    fun getAllScript(
+    fun getAllUserScript(
         @GetUserId userId: Long,
-    ): ApiResponse<List<ScriptResponseDto>?> {
-        val result = scriptService.getAllScripts(userId)
+    ): ApiResponse<List<UserScriptDto>?> {
+        val result = scriptService.getAllUserScripts(userId)
 
         return if (result == null) {
             ApiResponse.success(
@@ -45,7 +45,7 @@ class ScriptController(
             ApiResponse.success(
                 result = result,
                 status = HttpStatus.OK.value(),
-                message = "모든 스크립트 조회"
+                message = "모든 스크립트 조회 완료"
             )
         }
     }
@@ -53,13 +53,13 @@ class ScriptController(
     @GetMapping("/view/{scriptId}")
     fun getScript(
         @PathVariable scriptId: Long
-    ): ApiResponse<ScriptResponseDto> {
-        val result = scriptService.getScript(scriptId)
+    ): ApiResponse<UserScriptDto> {
+        val result = scriptService.getUserScript(scriptId)
 
         return ApiResponse.success(
                 result = result,
                 status = HttpStatus.OK.value(),
-                message = ""
+                message = "스크립트 조회 완료"
         )
 
     }
