@@ -9,8 +9,8 @@ sys.stdout = io.TextIOWrapper(sys.stdout.detach(), encoding="utf-8")
 sys.stderr = io.TextIOWrapper(sys.stderr.detach(), encoding="utf-8")
 
 # CSV 캐시 파일 경로
-BASE_DIR = os.path.abspath(os.path.abspath(__file__))
-CSV_PATH = os.path.join(BASE_DIR, "data", "law_data.csv")
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+CSV_PATH = os.path.join(BASE_DIR, "data", "law_data_prep.csv")
 CACHE_PATH = os.path.join(BASE_DIR, "cache", "law_cache.pkl")
 
 # 캐싱 시작

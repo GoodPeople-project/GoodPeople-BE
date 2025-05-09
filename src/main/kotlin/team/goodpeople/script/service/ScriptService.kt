@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service
 import team.goodpeople.global.exception.CustomErrorCode
 import team.goodpeople.global.exception.GlobalException
 import team.goodpeople.script.FastApiClient
+import team.goodpeople.script.dto.PredictResponseDto
 import team.goodpeople.script.dto.ScriptRequestDto
 import team.goodpeople.script.dto.UserScriptDto
 import team.goodpeople.script.dto.SimilarityResponseDto
@@ -51,6 +52,25 @@ class ScriptService(
 //        scriptEntityRepository.save(scriptEntity)
 
         /** 결과 반환 */
+        return result
+    }
+
+    fun saveAndReturnPrediction(
+        userId: Long,
+        scriptRequestDto: ScriptRequestDto,
+    ): PredictResponseDto {
+        /** 유저 유효성 확인 */
+        val user = userRepository.findById(userId)
+            .orElseThrow { throw GlobalException(CustomErrorCode.USER_NOT_EXISTS) }
+
+        val content = scriptRequestDto.content
+
+        /** FastAPI 서버에 스크립트 요청 */
+        // TODO: 결과 스키마 맞출 것
+        val result = fastApiClient.predictCase(content)
+
+        /** TODO: DB에 AI 응답 저장 */
+
         return result
     }
 

@@ -3,6 +3,7 @@ package team.goodpeople.script.controller
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
 import team.goodpeople.global.response.ApiResponse
+import team.goodpeople.script.dto.PredictResponseDto
 import team.goodpeople.script.dto.ScriptRequestDto
 import team.goodpeople.script.dto.UserScriptDto
 import team.goodpeople.script.dto.SimilarityResponseDto
@@ -21,6 +22,20 @@ class ScriptController(
         @RequestBody scriptRequestDto: ScriptRequestDto
     ): ApiResponse<SimilarityResponseDto> {
         val result = scriptService.saveAndReturnSimilarity(userId, scriptRequestDto)
+
+        return ApiResponse.success(
+            result = result,
+            status = HttpStatus.OK.value(),
+            message = "출력 완료"
+        )
+    }
+
+    @PostMapping("/predict")
+    fun predictCase(
+        @GetUserId userId: Long,
+        @RequestBody scriptRequestDto: ScriptRequestDto
+    ): ApiResponse<PredictResponseDto> {
+        val result = scriptService.saveAndReturnPrediction(userId, scriptRequestDto)
 
         return ApiResponse.success(
             result = result,
