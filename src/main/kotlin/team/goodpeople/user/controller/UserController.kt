@@ -70,7 +70,7 @@ class UserController(private val userService: UserService) {
      * - 중복 닉네임이 존재하면 true를 담아 응답
      * - 중복 닉네임이 존재하지 않으면 false를 담아 응답
      */
-    @GetMapping("/nickname/check")
+    @PostMapping("/nickname/check")
     fun checkIsNicknameDuplicated(
         @RequestBody @Valid updateNicknameRequest: UpdateNicknameRequest
     ): ApiResponse<Boolean> {
@@ -167,7 +167,7 @@ class UserController(private val userService: UserService) {
      * - 중복 이메일이 존재하면 true를 담아 응답
      * - 중복 이메일이 존재하지 않으면 false를 담아 응답
      */
-    @GetMapping("/email/check")
+    @PostMapping("/email/check")
     fun checkIsEmailDuplicated(
         @RequestBody @Valid emailDto: EmailDto
     ): ApiResponse<Boolean> {
