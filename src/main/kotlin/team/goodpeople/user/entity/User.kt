@@ -5,6 +5,7 @@ import jakarta.persistence.*
 import jakarta.validation.constraints.NotNull
 import jakarta.validation.constraints.Size
 import team.goodpeople.common.BaseEntity
+import team.goodpeople.community.post.entity.Post
 import team.goodpeople.script.entity.UserScript
 
 /**
@@ -93,10 +94,12 @@ class User private constructor (
     @field:Column(name = "login_type")
     val loginType: LoginType,
 
-    @field:OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
-    val userScripts: List<UserScript> = emptyList(),
+    @field:OneToMany(mappedBy = "user", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
+    val userScripts: MutableList<UserScript> = mutableListOf(),
 
-    ) : BaseEntity() {
+    @field:OneToMany(mappedBy = "author", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
+    val posts: MutableList<Post> = mutableListOf(),
+) : BaseEntity() {
     @field:Nullable
     @field:Size(min = 8)
     @field:Column(name = "password")

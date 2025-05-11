@@ -10,8 +10,9 @@ interface UserRepository : CrudRepository<User, Long> {
     fun existsByNickname(nickname: String): Boolean
 
     fun findUserById(userId: Long): User?
-
     fun findUserByUsername(username: String): User?
+
+    fun getUserById(userId: Long): User?
 
     fun deleteUserById(userId: Long)
 
