@@ -30,6 +30,7 @@ class ScriptController(
         )
     }
 
+    // TODO: 유사도와 같이 구동되도록
     @PostMapping("/predict")
     fun predictCase(
         @GetUserId userId: Long,
@@ -65,8 +66,9 @@ class ScriptController(
         }
     }
 
+    /** 사용자가 작성했던 스크립트 단건만 조회 */
     @GetMapping("/view/{scriptId}")
-    fun getScript(
+    fun getUserScript(
         @PathVariable scriptId: Long
     ): ApiResponse<UserScriptDto> {
         val result = scriptService.getUserScript(scriptId)
@@ -78,4 +80,7 @@ class ScriptController(
         )
 
     }
+
+    /** 유사도 모델 응답 단건 조회 */
+
 }

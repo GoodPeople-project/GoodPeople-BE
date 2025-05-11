@@ -3,11 +3,9 @@ package team.goodpeople.script.entity
 import jakarta.persistence.*
 import jakarta.validation.constraints.NotNull
 import team.goodpeople.user.entity.User
-import java.time.LocalDateTime
-import java.util.*
 
 @Entity
-class SimilarityAnalysis(
+class PredictAnalysis(
     @Id
     val id: Long? = null,
 
@@ -22,19 +20,17 @@ class SimilarityAnalysis(
     @Column(name = "content", columnDefinition = "TEXT")
     val content: String,
 ) {
-    /** */
     companion object {
-        fun createSimilarityAnalysis(
+        fun createPredictAnalysis(
             content: String,
             userScript: UserScript,
-        ): SimilarityAnalysis {
-            return SimilarityAnalysis(
+        ): PredictAnalysis {
+            return PredictAnalysis(
                 content = content,
                 userScript = userScript
             )
         }
     }
-
 
     /** 필수 보조 생성자 */
     constructor() : this(
@@ -47,20 +43,5 @@ class SimilarityAnalysis(
                 nickname = "default"
             )
         )
-//        userScript = UserScript(
-//            id = null,
-//            startTime = Date(),
-//            endTime = Date(),
-//            onGoing = null,
-//            position = null,
-//            relation = null,
-//            size = null,
-//            department = null,
-//            date = null,
-//            content = "default",
-//            evidence = "default",
-//            information = null,
-//            requestedAt = LocalDateTime.now(),
-//        )
     )
 }

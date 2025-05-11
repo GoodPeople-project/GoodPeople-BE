@@ -28,21 +28,5 @@ data class SimilarityResponseDto(
     val myCase: String,
     val mainCase: SimilarMainCase,
     val keyword: String,
-    val aiPredict: String,
     val otherCases: List<SimilarOtherCase>
 )
-
-//data class SimilarityResponseDto(
-//    val top3: SimilarityResult
-//)
-
-/* 기존 코드
-data class SimilarityResponseDto(
-    val top3: List<SimilarityCaseDto> = listOf(),
-)
-
-data class SimilarityCaseDto(
-    val story: String,
-    val result: String
-)
-*/

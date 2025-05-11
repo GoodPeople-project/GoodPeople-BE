@@ -68,7 +68,7 @@ class UserScript(
     val requestedAt: LocalDateTime,
 
     /** AI 답변과 일대일 관계 매핑 */
-    @field:OneToOne(mappedBy = "userScript", cascade = [(CascadeType.ALL)], orphanRemoval = true)
+    @field:OneToOne(mappedBy = "userScript", cascade = [(CascadeType.ALL)], orphanRemoval = true, fetch = FetchType.LAZY)
     val similarityAnalysis: SimilarityAnalysis? = null,
 
     /** User와 다대일 관계 매핑 */

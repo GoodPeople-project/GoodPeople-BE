@@ -50,7 +50,6 @@ class SimilarityResult(BaseModel):
     myCase: str
     mainCase: SimilarMainCase
     keyword: str
-    aiPredict: str
     otherCases: List[SimilarOtherCase]
 
 # 예측 모델 응답
@@ -92,7 +91,6 @@ def analyze_script(request: ScriptRequest):
         myCase=request.content,
         mainCase=main_case,
         keyword='String',
-        aiPredict='String',
         otherCases=other_cases
     )
 
