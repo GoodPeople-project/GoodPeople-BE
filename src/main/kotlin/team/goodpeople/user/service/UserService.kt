@@ -30,6 +30,7 @@ class UserService(
             username = dto.username,
             password = bCryptPasswordEncoder.encode(dto.password),
             nickname = dto.nickname,
+            email = dto.username
         )
 
         userRepository.save(newUser)

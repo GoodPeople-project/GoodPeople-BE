@@ -105,12 +105,16 @@ class User private constructor (
 
     companion object {
         /** 폼 회원가입 팩토리 메서드 */
-        fun signUpWithForm(username: String, password: String, nickname: String): User {
+        fun signUpWithForm(
+            username: String,
+            password: String,
+            nickname: String,
+            email: String): User {
             return User(
                 username = username,
                 password = password,
                 nickname = nickname,
-                email = "",
+                email = email,
                 loginType = LoginType.FORM
             )
         }

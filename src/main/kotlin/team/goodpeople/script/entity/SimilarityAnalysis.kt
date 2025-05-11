@@ -44,7 +44,8 @@ class SimilarityAnalysis(
             user = User.signUpWithForm(
                 username = "default",
                 password = "default",
-                nickname = "default"
+                nickname = "default",
+                email = "default@gmail.com"
             )
         )
 //        userScript = UserScript(

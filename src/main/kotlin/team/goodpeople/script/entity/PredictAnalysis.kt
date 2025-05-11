@@ -40,7 +40,8 @@ class PredictAnalysis(
             user = User.signUpWithForm(
                 username = "default",
                 password = "default",
-                nickname = "default"
+                nickname = "default",
+                email = "default@gmail.com"
             )
         )
     )
