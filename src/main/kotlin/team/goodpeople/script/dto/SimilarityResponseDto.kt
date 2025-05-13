@@ -28,5 +28,6 @@ data class SimilarityResponseDto(
     val myCase: String,
     val mainCase: SimilarMainCase,
     val keyword: String,
+    val aiPredict: String,
     val otherCases: List<SimilarOtherCase>
 )

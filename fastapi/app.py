@@ -53,6 +53,7 @@ class SimilarityResult(BaseModel):
     myCase: str
     mainCase: SimilarMainCase
     keyword: str
+    aiPredict: str
     otherCases: List[SimilarOtherCase]
 
 # 예측 모델 응답
@@ -105,10 +106,28 @@ def similar_script(request: ScriptRequest):
 
         keywords = generate_keyword(my_case, main_case)
 
+        # 예측 모델
+        client = OpenAI(api_key=API_SECRET_KEY)
+        pred_completion = client.chat.completions.create(
+            model=PREDICT_MODEL_KEY,
+            messages=[
+                {'role': 'system', 'content': '당신은 직장 내 괴롭힘과 관련된 재판을 담당하는 대한민국 법원의 판사 역할을 수행하며, 직장 내 괴롭힘으로 인정되는 것을 좀 더 엄격하게 판단'},
+                {'role': 'user', 'content': f'{my_case} 위 사례가 직장 내 괴롭힘에 해당하는 경우에는 "이 사건에서 직장 내 괴롭힘이 인정되는 이유는 다음과 같이 요약할 수 있습니다. ~ "의 형태로, 직장 내 괴롭힘에 해당하지 않는 경우에는 "이 사건에서 직장 내 괴롭힘이 인정되지 않는 이유는 다음과 같이 요약할 수 있습니다. ~ " 의 형태로, 일부는 직장 내 괴롭힘에 해당하고 일부는 직장 내 괴롭힘에 해당하지 않는 경우에는 "이 사건에서 직장 내 괴롭힘이 인정되는 부분의 이유는 다음과 같이 요약할 수 있습니다. ~ 반면, 이 사건에서 직장 내 괴롭힘이 인정되지 않는 부분의 이유는 다음과 같이 요약할 수 있습니다. ~"의 형태로 영어표현을 사용하지 않고 출력'}
+            ]
+        )
+
+        result = pred_completion.choices[0].message.content
+        result = re.sub('‧', '·', result)
+        result = re.sub(r'\s+', ' ', result)
+        result = re.sub('[\n+]', ' ', result)
+        result = re.sub(r'\([^)]*\)', '', result)
+        result = re.sub('[①②③④⑤]', '', result)
+
         return SimilarityResult(
             myCase=request.content,
             mainCase=main_case,
             keyword=keywords,
+            aiPredict=result,
             otherCases=other_cases
         )
 
