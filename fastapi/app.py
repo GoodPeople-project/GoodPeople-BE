@@ -37,7 +37,7 @@ class ScriptRequest(BaseModel):
 class SimilarMainCase(BaseModel):
     case: str
     caseNo: str
-    score: float
+    score: int
     judgementResult: str
     judgementReason: str
 
@@ -45,7 +45,7 @@ class SimilarMainCase(BaseModel):
 class SimilarOtherCase(BaseModel):
     case: str
     caseNo: str
-    score: float
+    score: int
     judgementResult: str
 
 # 서비스에 반환할 최종 응답 형태
@@ -76,17 +76,17 @@ def similar_script(request: ScriptRequest):
         main_case = SimilarMainCase(
             case = df['story'][i0],
             caseNo = df['number'][i0],
-            score = cos_scores[i0],
+            score = int(np.round(cos_scores[i0], 2) * 100),
             judgementResult = df['outcome'][i0],
             judgementReason = df['result'][i0]
         )
 
-        # 2. 나머지 케이스. 몇 개를 뽑느냐에 따라 조절 가능할 듯
+        # 2. 나머지 케이스
         other_cases = [
             SimilarOtherCase(
-                case = df['story'][i],
+                case = df['summary'][i],
                 caseNo = df['number'][i],
-                score = cos_scores[i],
+                score = int(np.round(cos_scores[i], 2) * 100),
                 judgementResult = df['outcome'][i],
             ) for i in top4_idx[1:]
         ]

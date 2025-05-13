@@ -12,7 +12,7 @@ package team.goodpeople.script.dto
 data class SimilarMainCase(
     val case: String,
     val caseNo: String,
-    val score: Double,
+    val score: Int,
     val judgementResult: String,
     val judgementReason: String
 )
@@ -20,7 +20,7 @@ data class SimilarMainCase(
 data class SimilarOtherCase(
     val case: String,
     val caseNo: String,
-    val score: Double,
+    val score: Int,
     val judgementResult: String
 )
 
