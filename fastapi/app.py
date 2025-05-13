@@ -75,7 +75,7 @@ def similar_script(request: ScriptRequest):
         main_case = SimilarMainCase(
             case = df['story'][i0],
             caseNo = df['number'][i0],
-            score = df['prop'][i0],
+            score = cos_scores[i0],
             judgementResult = df['outcome'][i0],
             judgementReason = df['result'][i0]
         )
@@ -85,7 +85,7 @@ def similar_script(request: ScriptRequest):
             SimilarOtherCase(
                 case = df['story'][i],
                 caseNo = df['number'][i],
-                score = df['prop'][i],
+                score = cos_scores[i],
                 judgementResult = df['outcome'][i],
             ) for i in top4_idx[1:]
         ]
@@ -103,10 +103,12 @@ def similar_script(request: ScriptRequest):
             result = keyword_completion.choices[0].message.content
             return result
 
+        keywords = generate_keyword(my_case, main_case)
+
         return SimilarityResult(
             myCase=request.content,
             mainCase=main_case,
-            keyword=generate_keyword(my_case, main_case),
+            keyword=keywords,
             otherCases=other_cases
         )
 
