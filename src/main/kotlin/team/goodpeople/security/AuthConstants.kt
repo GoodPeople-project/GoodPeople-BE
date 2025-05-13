@@ -3,9 +3,9 @@ package team.goodpeople.security
 object AuthConstants {
 
     /** Security Common Constants */
-    const val DEPLOY_BASE_URL: String = "http://ec2-13-124-147-239.ap-northeast-2.compute.amazonaws.com:8080"
+    const val DEPLOY_BASE_URL: String = "https://goodpeople.ai.kr"
 //    const val DEVELOP_BASE_URL: String = "http://localhost:8080"
-    val ALLOWED_ORIGIN: List<String> = listOf("http://localhost:3000")
+    val ALLOWED_ORIGIN: List<String> = listOf("http://localhost:3000", "https://goodpeople.ai.kr")
     val ALLOWED_METHOD: List<String> = listOf("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
 
     const val MASKED_PASSWORD: String = "**********"
@@ -25,13 +25,13 @@ object AuthConstants {
 
 
     /** Cookie Constants */
-    const val COOKIE_DOMAIN: String = "ec2-13-124-147-239.ap-northeast-2.compute.amazonaws.com"
+    const val COOKIE_DOMAIN: String = "goodpeople.ai.kr"
 //    const val COOKIE_DOMAIN: String = "localhost"
     const val COOKIE_PATH: String = "/"
     const val COOKIE_MAX_AGE: Int = 24 * 60 * 60 * 1000 // 1일
 
     const val COOKIE_HTTP_ONLY: Boolean = true
-    const val COOKIE_SET_SECURE: Boolean = false
+    const val COOKIE_SET_SECURE: Boolean = true
 
 
     /** Authentication Code Constants */
