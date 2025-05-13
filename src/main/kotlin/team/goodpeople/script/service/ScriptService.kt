@@ -48,6 +48,8 @@ class ScriptService(
             user = user)
         userScriptRepository.save(userScript)
 
+        /** TODO: 임시. keyword를 리스트에 담기 */
+
         /** DB에 AI 응답 저장 */
         // TODO: 새로운 스키마에 맞춰 수정하기. 현재는 단순 직렬화
         val mappedResult = objectMapper.writeValueAsString(result)
