@@ -17,7 +17,7 @@ app = FastAPI()
 # 서버 부팅 시 미리 캐싱한 CSV 파일 로드
 # with open("cache/law_cache.pkl", "rb") as f:
 #     df, x = pickle.load(f)
-path = './data/law_data_prep.csv'
+path = './data/law_data_prep_v2.csv'
 df = pd.read_csv(path, encoding='utf-8')
 
 # 모델 로드
@@ -69,17 +69,15 @@ def similar_script(request: ScriptRequest):
     if cos_scores.max() > 0.5:
         top4_idx = np.argsort(cos_scores)[::-1][:4]
 
-        # TODO: 컬럼 맞추기
         i0 = top4_idx[0]
 
         # 1. 가장 유사한 케이스
         main_case = SimilarMainCase(
             case = df['story'][i0],
             caseNo = df['number'][i0],
-            # TODO: 임시 처리
-            score = 100,
-            judgementResult = 'String',
-            judgementReason = 'String'
+            score = cos_scores[i0],
+            judgementResult = df['outcome'][i0],
+            judgementReason = df['result'][i0]
         )
 
         # 2. 나머지 케이스. 몇 개를 뽑느냐에 따라 조절 가능할 듯
@@ -87,9 +85,8 @@ def similar_script(request: ScriptRequest):
             SimilarOtherCase(
                 case = df['story'][i],
                 caseNo = df['number'][i],
-                # TODO: 임시 처리
-                score = 90,
-                judgementResult = 'String'
+                score = cos_scores[i],
+                judgementResult = df['outcome'][i],
             ) for i in top4_idx[1:]
         ]
 
@@ -106,10 +103,12 @@ def similar_script(request: ScriptRequest):
             result = keyword_completion.choices[0].message.content
             return result
 
+        keywords = generate_keyword(my_case, main_case)
+
         return SimilarityResult(
             myCase=request.content,
             mainCase=main_case,
-            keyword=generate_keyword(my_case, main_case),
+            keyword=keywords,
             otherCases=other_cases
         )
 
