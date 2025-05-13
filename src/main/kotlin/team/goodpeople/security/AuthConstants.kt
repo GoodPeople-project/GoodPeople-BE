@@ -5,7 +5,7 @@ object AuthConstants {
     /** Security Common Constants */
     const val DEPLOY_BASE_URL: String = "https://goodpeople.ai.kr"
 //    const val DEVELOP_BASE_URL: String = "http://localhost:8080"
-    val ALLOWED_ORIGIN: List<String> = listOf("https://good-people-fe.vercel.app", "https://goodpeople.ai.kr")
+    val ALLOWED_ORIGIN: List<String> = listOf("https://good-people-fe.vercel.app", "https://goodpeople.ai.kr", "http://localhost:3000")
     val ALLOWED_METHOD: List<String> = listOf("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
 
     const val MASKED_PASSWORD: String = "**********"
@@ -31,7 +31,7 @@ object AuthConstants {
     const val COOKIE_MAX_AGE: Int = 24 * 60 * 60 * 1000 // 1일
 
     const val COOKIE_HTTP_ONLY: Boolean = true
-    const val COOKIE_SET_SECURE: Boolean = true
+    const val COOKIE_SET_SECURE: Boolean = false
 
 
     /** Authentication Code Constants */
