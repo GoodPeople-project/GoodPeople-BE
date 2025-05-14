@@ -38,6 +38,24 @@ class UserService(
         return true
     }
 
+    fun getUserProfile(
+        userId: Long,
+    ): UserProfileDto {
+
+        val user = userRepository.getUserById(userId)
+            ?: throw GlobalException(CustomErrorCode.USER_NOT_EXISTS)
+
+        val userProfile = UserProfileDto(
+            username = user.username,
+            nickname = user.nickname,
+            email = user.email,
+            role = user.role.toString(),
+            loginType = user.loginType.toString()
+        )
+
+        return userProfile
+    }
+
     /** 이메일 인증 번호 전송 */
     // TODO: 재전송
     fun sendEmailAuthenticationCode(

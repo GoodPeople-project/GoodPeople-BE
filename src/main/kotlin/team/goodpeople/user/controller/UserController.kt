@@ -32,6 +32,26 @@ class UserController(private val userService: UserService) {
     }
 
     /**
+     * 사용자 정보 조회
+     *
+     * @param userId
+     * @return UserProfileDto
+     */
+    @GetMapping("/profile")
+    fun getUserProfile(
+        @GetUserId userId: Long
+    ): ApiResponse<UserProfileDto> {
+
+        val result = userService.getUserProfile(userId)
+
+        return ApiResponse.success(
+            result = result,
+            status = HttpStatus.OK.value(),
+            message = "유저 정보를 불러왔습니다."
+        )
+    }
+
+    /**
      * 닉네임 업데이트
      *
      * @param userId 어노테이션으로 획득
