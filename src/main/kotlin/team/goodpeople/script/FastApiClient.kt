@@ -1,12 +1,11 @@
 package team.goodpeople.script
 
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.WebClient
 import reactor.core.publisher.Mono
-import team.goodpeople.script.dto.PredictResponseDto
-import team.goodpeople.script.dto.ScriptRequestDto
-import team.goodpeople.script.dto.SimilarityResponseDto
+import team.goodpeople.script.dto.*
 
 @Component
 class FastApiClient(
@@ -19,12 +18,21 @@ class FastApiClient(
 
     fun analyzeSimilarCase(
         script: String
-    ): SimilarityResponseDto {
+    ): SimilarityResult {
         return webClient.post()
             .uri("/similarity")
             .bodyValue(ScriptRequestDto(script))
-            .retrieve()
-            .bodyToMono(SimilarityResponseDto::class.java)
+            .exchangeToMono { response ->
+                when {
+                    response.statusCode() == HttpStatus.NO_CONTENT ->
+                        Mono.just(SimilarityNoCaseResponseDto())
+
+                    response.statusCode().is2xxSuccessful ->
+                        response.bodyToMono(SimilarityResponseDto::class.java)
+                else ->
+                    response.bodyToMono(ErrorResultDto::class.java)
+                }
+            }
             .onErrorResume {
                 Mono.error(RuntimeException("FastAPI 호출 실패: ${it.message}"))
             }

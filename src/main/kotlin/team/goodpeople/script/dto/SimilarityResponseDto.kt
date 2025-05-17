@@ -8,6 +8,7 @@ package team.goodpeople.script.dto
  *  { "story": "유사 사례3", "result": "인정"}
  * ]
  * */
+sealed class SimilarityResult
 
 data class SimilarMainCase(
     val case: String,
@@ -30,4 +31,12 @@ data class SimilarityResponseDto(
     val keyword: String,
     val aiPredict: String,
     val otherCases: List<SimilarOtherCase>
-)
+) : SimilarityResult()
+
+data class SimilarityNoCaseResponseDto(
+    val content: String = "회원님의 사례와 유사한 사례가 존재하지 않습니다."
+) : SimilarityResult()
+
+data class ErrorResultDto(
+    val content: String = ""
+) : SimilarityResult()

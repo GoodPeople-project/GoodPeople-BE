@@ -1,14 +1,14 @@
 import sys
 import io
 import os
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Response, Request, status
 from pydantic import BaseModel
 from sentence_transformers import SentenceTransformer, util
 import numpy as np
 import re
 import pickle
 import uvicorn
-from typing import List
+from typing import List, Union
 from openai import OpenAI
 import pandas as pd
 
@@ -61,7 +61,11 @@ class PredictResult(BaseModel):
     content: str
 
 # 유사도 사례 반환
-@app.post("/similarity", response_model=SimilarityResult)
+@app.post(
+    "/similarity",
+    response_model=Union[SimilarityResult, SimilarityNoResult],
+    responses={204: {"content": "유사 사례가 없습니다."}}
+)
 def similar_script(request: ScriptRequest):
     total_case = df['story']
     my_case = request.content
@@ -132,7 +136,9 @@ def similar_script(request: ScriptRequest):
         )
 
     else:
-        print("현재 고객님이 입력하신 사례와 유사한 사례가 없습니다.\n조금 더 구체적으로 작성해주시거나 추후 유사한 사례가 생길 경우 알려드리도록 하겠습니다.")
+        return Response(
+            status_code=status.HTTP_204_NO_CONTENT
+        )
 
 # 예측 모델
 @app.post("/predict", response_model=PredictResult)
