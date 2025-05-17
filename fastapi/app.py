@@ -63,7 +63,7 @@ class PredictResult(BaseModel):
 # 유사도 사례 반환
 @app.post(
     "/similarity",
-    response_model=Union[SimilarityResult, SimilarityNoResult],
+    response_model=SimilarityResult,
     responses={204: {"content": "유사 사례가 없습니다."}}
 )
 def similar_script(request: ScriptRequest):
